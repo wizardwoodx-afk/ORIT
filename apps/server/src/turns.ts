@@ -6,10 +6,10 @@
  * then replays exactly what was signed through the gateway. No model is called, so nothing is
  * pretending to be intelligence; the governance path is what this exercises.
  */
-import { randomId } from '@si/core';
+import { type ToolCall, randomId, signString } from '@si/core';
 import { type Check, Rehearsal, commitChangeSet, prove, scopeForChangeSet, verifyChangeSetIntegrity } from '@si/changeset';
 import type { Broker, Detent, OrderAuthority, OrderRevision, ScopeEntry, Session } from '@si/gateway';
-import { humanSign, makeRevision } from '@si/gateway';
+import { approvalPayload, argsHashOf, humanSign, makeRevision } from '@si/gateway';
 import { SIGNATURE, say } from '@si/voice';
 import type { ApprovalDesk } from './approvals.ts';
 import type { GovernedSpace } from './boot.ts';
@@ -192,7 +192,14 @@ export class TurnRunner {
     const session1 = this.session(rev1, agent.publicB64, 'COMMIT', gw.mintGrants(rev1, agent.publicB64));
 
     this.state(turnId, 'commit', 'running');
-    const commit = await commitChangeSet(gw.broker(session1), cs, 'commit');
+    // A Space whose trust dial asks per live edit gets a signature bound to that exact call and its
+    // argument hash. The harness holds the human key in this build; the keychain takes it at release.
+    const authorize = (call: ToolCall): void => {
+      const argsHash = argsHashOf(call.args);
+      const sig = signString(human.privateKey, approvalPayload({ kind: 'approve', callId: call.id, argsHash }));
+      gw.addApproval({ kind: 'approve', callId: call.id, argsHash, keyId: human.id, sig });
+    };
+    const commit = await commitChangeSet(gw.broker(session1), cs, 'commit', authorize);
 
     if (commit.status !== 'committed') {
       const state = commit.status === 'drifted' ? 'drifted' : 'failed';

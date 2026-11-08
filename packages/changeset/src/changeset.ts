@@ -151,7 +151,18 @@ const describe = (r: ExecResult): string =>
  * It takes no model provider on purpose: what the human signed is exactly what runs.
  * Each write is conditional on the live file still matching what was rehearsed (compare-and-swap).
  */
-export async function commitChangeSet(broker: Broker, cs: ChangeSet, node = 'commit'): Promise<CommitResult> {
+/**
+ * `authorize` runs for every call that will change something, immediately before it is made. A caller
+ * that must satisfy a human-approval dial uses it to register a signature bound to that exact call id
+ * and argument hash. It cannot make a call pass; it can only present authority the gateway already
+ * verifies against registered human keys.
+ */
+export async function commitChangeSet(
+  broker: Broker,
+  cs: ChangeSet,
+  node = 'commit',
+  authorize?: (call: ToolCall) => void,
+): Promise<CommitResult> {
   const bad = verifyChangeSetIntegrity(cs);
   if (bad) return { status: 'rejected', applied: [], drifted: [], reason: bad, receipts: [] };
 
@@ -171,13 +182,14 @@ export async function commitChangeSet(broker: Broker, cs: ChangeSet, node = 'com
       o.kind === 'delete'
         ? mkCall('fs.delete', { path: o.path, expectBeforeHash: o.beforeHash }, node)
         : mkCall('fs.write', { path: o.path, content: o.after, expectBeforeHash: o.beforeHash }, node);
+    authorize?.(call);
     const r = await broker.call(call);
     if (r.kind === 'ok') {
       applied.push(o);
       receipts.push(r.receiptSeq);
       continue;
     }
-    const rb = await rollback(broker, applied, node);
+    const rb = await rollback(broker, applied, node, authorize);
     const wasDrift = r.kind === 'error' && r.name === 'PreconditionFailed';
     return {
       status: wasDrift ? 'drifted' : 'rolled_back',
@@ -191,13 +203,19 @@ export async function commitChangeSet(broker: Broker, cs: ChangeSet, node = 'com
 }
 
 /** R1 rollback from stored before-content, conditional on the file still being what we wrote. Returns paths that failed. */
-export async function rollback(broker: Broker, applied: readonly FileOp[], node = 'rollback'): Promise<string[]> {
+export async function rollback(
+  broker: Broker,
+  applied: readonly FileOp[],
+  node = 'rollback',
+  authorize?: (call: ToolCall) => void,
+): Promise<string[]> {
   const failed: string[] = [];
   for (const o of [...applied].reverse()) {
     const call =
       o.kind === 'create'
         ? mkCall('fs.delete', { path: o.path, expectBeforeHash: o.afterHash }, node)
         : mkCall('fs.write', { path: o.path, content: o.before, expectBeforeHash: o.afterHash }, node);
+    authorize?.(call);
     const r = await broker.call(call);
     if (r.kind !== 'ok') failed.push(o.path);
   }

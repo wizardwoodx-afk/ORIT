@@ -142,10 +142,28 @@ describe('a turn', () => {
     expect((await snapshot('co-think')).workspace.files.length).toBe(before);
   });
 
+  it('commits in a Space whose dial asks on every live edit', async () => {
+    // Co-work sits at dial 2: the gateway demands a signature per call, not only on the order.
+    await fetch(`${base}/api/message`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ space: 'co-work', text: 'Summarise the release gate' }),
+    });
+    const waiting = await waitFor(() => snapshot('co-work'), (s) => s.pending.length === 1, 'a co-work approval');
+    expect(waiting.policyCeiling).toBe('internal');
+    await fetch(`${base}/api/approval`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ space: 'co-work', id: waiting.pending[0]?.id, decision: 'approve' }),
+    });
+    const done = await waitFor(() => snapshot('co-work'), (s) => statesIn(s).includes('completed'), 'co-work completion');
+    expect(done.workspace.files).toContain('notes/summarise-the-release-gate.md');
+    expect(done.ledger.chainOk).toBe(true);
+  });
+
   it('keeps the two Spaces apart', async () => {
     const work = await snapshot('co-work');
-    expect(work.thread).toEqual([]);
-    expect(work.head).toBe(0);
+    expect(work.workspace.files).toEqual(['notes/summarise-the-release-gate.md']);
     expect(work.policyCeiling).toBe('internal');
     expect((await snapshot('co-think')).policyCeiling).toBe('confidential');
   });

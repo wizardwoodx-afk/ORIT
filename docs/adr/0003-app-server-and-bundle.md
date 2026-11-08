@@ -32,6 +32,12 @@ A turn is a real path through the kernel:
    compare-and-swap and rolls back on drift.
 5. Prove: `prove` re-reads the live files and re-runs the checks; the ledger is sealed by the witness.
 
+4. A Space at dial 2 (Co-work) also asks per live edit. For those Spaces the harness signs each call
+   the commit is about to make, bound to that call's id and argument hash, through the same registered
+   human key. `commitChangeSet` grew one optional hook for this (`authorize`), which can only present
+   authority the gateway already verifies; it cannot make a call pass. Probe, commit and prove for both
+   dials are covered by tests.
+
 Restated honestly: in this development build the server holds the human signing key, because there is
 no OS keychain integration yet. That is a harness convenience and a release blocker, not a design
 claim. It is recorded in `BUILD_PLAN.md` phase 0/1.
