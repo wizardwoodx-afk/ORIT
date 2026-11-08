@@ -1,0 +1,370 @@
+/* Motion. Only transform and opacity; one easing curve; nothing longer than 300ms except the
+ * two slow loops (thinking shimmer 1600ms, reading dash 1000ms) that are ambient, not transitions.
+ * Every animation here is driven by a real backend state class, never by a timer on its own. */
+
+/* ---------- transitions ---------- */
+.tr-micro {
+  transition: opacity var(--t-micro) var(--ease), transform var(--t-micro) var(--ease),
+    background-color var(--t-micro) var(--ease), border-color var(--t-micro) var(--ease);
+}
+
+.tr-panel {
+  transition: opacity var(--t-panel) var(--ease), transform var(--t-panel) var(--ease);
+}
+
+.tr-none {
+  transition: none;
+}
+
+/* ---------- entrances ---------- */
+@keyframes row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.enter-row {
+  animation: row-enter var(--t-panel) var(--ease) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--rise));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.enter-panel {
+  animation: panel-in var(--t-panel) var(--ease) both;
+}
+
+/* Docked approval bar: rises 8px. No modal, no shake. */
+@keyframes approval-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.approval-bar {
+  background: var(--s1);
+  border-top: 1px solid var(--attn);
+  padding: var(--sp-3) var(--sp-3);
+  animation: approval-rise var(--t-panel) var(--ease) both;
+}
+
+/* Receipt: clip-reveal of 8px. */
+@keyframes receipt-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--rise) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.receipt {
+  background: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--sp-2) var(--sp-3);
+  animation: receipt-reveal var(--t-panel) var(--ease) both;
+}
+
+/* Rolled back: the receipt strikes through and re-stamps the recovery label. */
+@keyframes strike-through {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.receipt[data-recovery="rolled-back"] .receipt-effect {
+  position: relative;
+  color: var(--fg-dim);
+}
+
+.receipt[data-recovery="rolled-back"] .receipt-effect::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--fg-dim);
+  transform-origin: left center;
+  animation: strike-through var(--t-panel) var(--ease) 60ms both;
+}
+
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.receipt[data-recovery="rolled-back"] .receipt-recovery {
+  animation: stamp-in var(--t-panel) var(--ease) 200ms both;
+  color: var(--tone-recovered);
+}
+
+/* ---------- the one deliberate moment: rehearsed becomes real ---------- */
+.commit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+}
+
+.commit-track {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+.commit-solid {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--accent-ink);
+  border-radius: var(--radius-sm);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.commit[data-phase="committing"] .commit-solid {
+  animation: commit-wipe var(--t-wipe) var(--ease) both;
+}
+
+.commit[data-phase="committed"] .commit-solid {
+  transform: scaleX(1);
+  animation: none;
+}
+
+@keyframes commit-wipe {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.commit-label {
+  position: relative;
+  padding: 0 var(--sp-2);
+  font-size: var(--fs-meta);
+  color: var(--fg-faint);
+}
+
+.commit[data-phase="committing"] .commit-label,
+.commit[data-phase="committed"] .commit-label {
+  color: var(--accent-ink);
+}
+
+/* ---------- thinking: a slow wave across the glyphs, one opacity step per character ----------
+ * A mask sweep would need a gradient function, which the slop scanner bans; stepping opacity per
+ * character reads the same at 11px and costs one compositor layer instead of a mask. */
+@keyframes thinking-wave {
+  0% {
+    opacity: 0.34;
+  }
+  18% {
+    opacity: 1;
+  }
+  36% {
+    opacity: 0.34;
+  }
+  100% {
+    opacity: 0.34;
+  }
+}
+
+.thinking {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  font-size: var(--fs-body);
+  color: var(--fg);
+}
+
+.thinking > span {
+  animation: thinking-wave var(--t-shimmer) linear infinite;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+.thinking[data-active="false"] > span {
+  animation: none;
+  opacity: 1;
+}
+
+/* ---------- indeterminate work: a hairline, never a spinner ---------- */
+@keyframes hairline-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+.loader-hairline {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.loader-hairline > i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: var(--accent-ink);
+  animation: hairline-sweep var(--t-shimmer) var(--ease) infinite;
+}
+
+/* Queued page rows: a short rotating dash. */
+@keyframes dash-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-dash {
+  display: inline-block;
+  width: var(--glyph);
+  height: var(--glyph);
+  border: 1px dashed var(--fg-faint);
+  border-radius: 50%;
+  animation: dash-spin var(--t-cursor) linear infinite;
+}
+
+/* Determinate progress: width is a transform, so it never reflows. */
+.progress {
+  position: relative;
+  height: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.progress > i {
+  position: absolute;
+  inset: 0;
+  background: var(--accent-ink);
+  transform-origin: left center;
+  transform: scaleX(var(--value, 0));
+  transition: transform var(--t-panel) var(--ease);
+}
+
+/* ---------- skeletons: static, and only after 300ms ---------- */
+@keyframes skeleton-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.skeleton {
+  background: var(--s2);
+  border-radius: var(--radius-sm);
+  height: 10px;
+  opacity: 0;
+  animation: skeleton-in 1ms linear var(--t-skeleton) both;
+}
+
+.skeleton-wide {
+  height: 10px;
+}
+
+/* ---------- streaming terminal cursor ---------- */
+@keyframes caret-step {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.caret {
+  display: inline-block;
+  width: 6px;
+  height: 12px;
+  background: var(--fg);
+  animation: caret-step var(--t-cursor) steps(1, end) infinite;
+  vertical-align: text-bottom;
+}
+
+/* ---------- global controls ---------- */
+.anim {
+  animation-play-state: running;
+}
+
+/* Window hidden: every loop pauses (DESIGN 6). Toggled by pauseWhenHidden(). */
+.is-window-hidden .anim,
+.is-window-hidden .thinking > span,
+.is-window-hidden .loader-hairline > i,
+.is-window-hidden .loader-dash,
+.is-window-hidden .caret,
+.is-window-hidden .state-running .glyph svg,
+.is-window-hidden .state-needs-approval .glyph svg,
+.is-window-hidden .source-chip {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-row,
+  .enter-panel,
+  .approval-bar,
+  .receipt,
+  .commit-solid,
+  .skeleton,
+  .receipt-effect::after,
+  .receipt-recovery {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .thinking > span,
+  .loader-hairline > i,
+  .loader-dash,
+  .caret {
+    animation: none;
+    opacity: 1;
+  }
+  /* Static markers replace the loops: a solid dot instead of a rotating dash, a full hairline. */
+  .loader-dash {
+    border: 1.5px solid var(--fg-faint);
+  }
+  .loader-hairline > i {
+    width: 100%;
+  }
+  .caret {
+    background: transparent;
+  }
+}

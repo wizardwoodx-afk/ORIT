@@ -14,7 +14,7 @@
 | MCP | `@modelcontextprotocol/client` v2 (spec 2026-07-28) | Per-Space allow-list, manifest digest pinning |
 | Models | OpenAI-compatible endpoint adapter (Ollama, llama.cpp server, cloud) | Verify each install's base URL and tool-call behavior |
 | UI | React 19, electron-vite (Vite), Tailwind v4, shadcn/ui primitives on Base UI or Radix, cmdk, Motion, Phosphor Icons (Regular), Shiki, Monaco diff editor, xterm.js + node-pty, TanStack Virtual and Router, Zustand | Pin exact versions at install. `node-pty` needs rebuild per Electron version |
-| Fonts | IBM Plex Sans, JetBrains Mono (OFL), bundled locally | No Inter, no CDN |
+| Fonts | IBM Plex Sans 5.3.0, JetBrains Mono 5.3.0, Source Serif 4 5.3.1, Newsreader 5.3.0, Instrument Serif 5.3.0 (all OFL-1.1), vendored as woff2 under `apps/desktop/src/renderer/fonts` | No Inter, no CDN. Digests pinned in `fonts/MANIFEST.json`, re-fetch with `npm run fonts:vendor` |
 | Web pipeline | `@mozilla/readability`, `turndown`, `linkedom` or `jsdom`, DOMPurify | Verify package names and versions at install |
 | Camofox | `camofox-browser` REST server over Camoufox | Pin commit and binary digest; localhost + API key; telemetry off; about 300MB first-run download, so bundle and verify |
 | Documents | Firecrawl AnyDoc | Verify repo, license, and CLI/Node API at a pinned commit before use |

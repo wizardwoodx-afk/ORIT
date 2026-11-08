@@ -16,5 +16,5 @@
     "skipLibCheck": true,
     "jsx": "react-jsx"
   },
-  "include": ["packages/*/src", "packages/*/test", "apps/*/src", "scripts/*.mts"]
+  "include": ["packages/*/src", "packages/*/test", "apps/*/src", "apps/*/test", "scripts/*.mts"]
 }

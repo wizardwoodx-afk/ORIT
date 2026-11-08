@@ -1,0 +1,72 @@
+[
+  {
+    "pkg": "@fontsource/ibm-plex-sans",
+    "version": "5.3.0",
+    "file": "ibm-plex-sans-latin-400-normal.woff2",
+    "out": "ibm-plex-sans-400.woff2",
+    "sha256": "3b646991d30055a93a4ecc499713d4347953a74a947ecab435ab72070cbdab0e"
+  },
+  {
+    "pkg": "@fontsource/ibm-plex-sans",
+    "version": "5.3.0",
+    "file": "ibm-plex-sans-latin-400-italic.woff2",
+    "out": "ibm-plex-sans-400-italic.woff2",
+    "sha256": "6de912e531b6c98084f1b2d5e5a91bad77be4e68bc4e396e43c46fc435e5f3d9"
+  },
+  {
+    "pkg": "@fontsource/ibm-plex-sans",
+    "version": "5.3.0",
+    "file": "ibm-plex-sans-latin-500-normal.woff2",
+    "out": "ibm-plex-sans-500.woff2",
+    "sha256": "0717336fb31fcdcde4b8deb3675bb4a0f7f6d484864afcd6751ac29975962203"
+  },
+  {
+    "pkg": "@fontsource/ibm-plex-sans",
+    "version": "5.3.0",
+    "file": "ibm-plex-sans-latin-600-normal.woff2",
+    "out": "ibm-plex-sans-600.woff2",
+    "sha256": "8960851d691c054ed38e259bdcf1a6190d157b4203ed5bb32c632a863fb8ec2f"
+  },
+  {
+    "pkg": "@fontsource-variable/jetbrains-mono",
+    "version": "5.3.0",
+    "file": "jetbrains-mono-latin-wght-normal.woff2",
+    "out": "jetbrains-mono-var.woff2",
+    "sha256": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e"
+  },
+  {
+    "pkg": "@fontsource-variable/source-serif-4",
+    "version": "5.3.1",
+    "file": "source-serif-4-latin-opsz-normal.woff2",
+    "out": "source-serif-4-opsz.woff2",
+    "sha256": "f2ea9c12d2fe9bd3a9589b02ad2c0909da88f30938c91adc838c4f4098f9f9e0"
+  },
+  {
+    "pkg": "@fontsource-variable/source-serif-4",
+    "version": "5.3.1",
+    "file": "source-serif-4-latin-opsz-italic.woff2",
+    "out": "source-serif-4-opsz-italic.woff2",
+    "sha256": "96e6393209728ab93c334ae739af8a040cd2006c82e8614d6465a8084db88f89"
+  },
+  {
+    "pkg": "@fontsource-variable/newsreader",
+    "version": "5.3.0",
+    "file": "newsreader-latin-opsz-normal.woff2",
+    "out": "newsreader-opsz.woff2",
+    "sha256": "6e4f2958c3a7c4a80acde4e5a679abe7e01bc1e30b92be3c7a8b696ef401d101"
+  },
+  {
+    "pkg": "@fontsource-variable/newsreader",
+    "version": "5.3.0",
+    "file": "newsreader-latin-opsz-italic.woff2",
+    "out": "newsreader-opsz-italic.woff2",
+    "sha256": "5dfcd10d24af8c82927ba57f7983dd997f7b200594c09c35a1b1ed9fc4597506"
+  },
+  {
+    "pkg": "@fontsource/instrument-serif",
+    "version": "5.3.0",
+    "file": "instrument-serif-latin-400-normal.woff2",
+    "out": "instrument-serif-400.woff2",
+    "sha256": "5eb09b5ac0e28b67c2f041c8ba6d244604ca0c0980d65912ab2d47fed84ddc31"
+  }
+]

@@ -1,0 +1,201 @@
+/* Type system. Five sizes: 11 meta, 13 body, 15 section, 17 read, 20 title (ADR 0001).
+ * The serif is for reading and titles, the sans for chrome, the mono for anything a machine counts. */
+
+.t-meta {
+  font-family: var(--font-ui);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+  letter-spacing: var(--tracking-meta);
+  color: var(--fg-dim);
+  text-transform: none;
+}
+
+.t-body {
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--fg);
+}
+
+.t-section {
+  font-family: var(--font-ui);
+  font-size: var(--fs-section);
+  line-height: 1.4;
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.005em;
+  color: var(--fg);
+}
+
+.t-title {
+  font-family: var(--font-ui);
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-title);
+  color: var(--fg);
+}
+
+/* Serif titles: the one place the reading face speaks at display sizes. */
+.t-title-serif,
+.t-section-serif {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-weight: var(--fw-regular);
+  letter-spacing: 0;
+  color: var(--fg);
+}
+
+.t-title-serif {
+  font-size: calc(var(--fs-title) + 3px);
+  line-height: 1.2;
+  font-variation-settings: "opsz" 36;
+}
+
+.t-section-serif {
+  font-size: calc(var(--fs-section) + 2px);
+  line-height: 1.35;
+  font-variation-settings: "opsz" 20;
+}
+
+/* Long-form reading: model answers, documents, memory notes. */
+.prose {
+  font-family: var(--font-serif);
+  font-size: var(--fs-read);
+  line-height: var(--lh-read);
+  font-optical-sizing: auto;
+  font-variation-settings: "opsz" 17;
+  color: var(--fg);
+  max-width: 68ch;
+}
+
+.prose > * + * {
+  margin-top: var(--sp-3);
+}
+
+.prose p {
+  margin: 0;
+}
+
+.prose strong {
+  font-weight: var(--fw-semibold);
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-family: var(--font-serif);
+  font-weight: var(--fw-medium);
+  margin: var(--sp-5) 0 0;
+  letter-spacing: 0;
+}
+
+.prose h1 {
+  font-size: calc(var(--fs-title) + 3px);
+  line-height: 1.2;
+  font-variation-settings: "opsz" 36;
+}
+
+.prose h2 {
+  font-size: var(--fs-section);
+}
+
+.prose h3 {
+  font-size: var(--fs-body);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0;
+  padding-left: var(--sp-5);
+}
+
+.prose li + li {
+  margin-top: var(--sp-1);
+}
+
+.prose blockquote {
+  margin: 0;
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--line-strong);
+  color: var(--fg-dim);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--s2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0 3px;
+}
+
+.prose pre {
+  font-family: var(--font-mono);
+  background: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--sp-3);
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: var(--fs-body);
+}
+
+.prose hr {
+  border-top: 1px solid var(--line);
+}
+
+/* Anything a machine reports: timers, hashes, costs, counts, command lines. */
+.mono,
+.num,
+.timer,
+.hash,
+.cost {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 0;
+}
+
+.mono {
+  font-size: var(--fs-body);
+}
+
+.num {
+  font-size: inherit;
+}
+
+.timer {
+  font-size: var(--fs-meta);
+  color: var(--fg-dim);
+}
+
+.hash {
+  font-size: var(--fs-meta);
+  color: var(--fg-faint);
+  word-break: break-all;
+}
+
+.muted {
+  color: var(--fg-dim);
+}
+
+.faint {
+  color: var(--fg-faint);
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-size: var(--fs-meta);
+  color: var(--fg-faint);
+  letter-spacing: var(--tracking-meta);
+}

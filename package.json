@@ -15,8 +15,11 @@
     "lint": "biome lint .",
     "test": "vitest run",
     "slop": "node scripts/slop-scan.mjs apps/desktop/src",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run slop",
-    "demo": "echo demo not built yet; see BUILD_PLAN.md"
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run design:report && npm run slop",
+    "demo": "echo demo not built yet; see BUILD_PLAN.md",
+    "fonts:vendor": "node scripts/vendor-fonts.mjs",
+    "preview": "node scripts/preview-server.mjs",
+    "design:report": "tsx scripts/design-report.mts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",

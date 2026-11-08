@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en" data-theme="lunar-ash" data-mode="dark" data-serif="source-serif">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SelfImpulse design system</title>
+    <link rel="stylesheet" href="/renderer/tokens.css" />
+    <link rel="stylesheet" href="/renderer/fonts.css" />
+    <link rel="stylesheet" href="/renderer/base.css" />
+    <link rel="stylesheet" href="/renderer/type.css" />
+    <link rel="stylesheet" href="/renderer/motion.css" />
+    <link rel="stylesheet" href="/renderer/states.css" />
+    <link rel="stylesheet" href="./preview.css" />
+    <script type="module" src="./preview.js"></script>
+  </head>
+  <body>
+    <div class="preview">
+      <aside class="rail">
+        <div class="rail-head">
+          <div class="brand">SelfImpulse</div>
+          <div class="rail-title">Design system</div>
+        </div>
+        <div class="rail-scroll">
+          <div class="rail-label">Theme</div>
+          <div id="themes" class="stack"></div>
+          <div class="rail-label">Mode</div>
+          <div class="seg" id="modes"></div>
+          <div class="rail-label">Options</div>
+          <label class="theme-btn" style="grid-template-columns: auto 1fr; align-items: center">
+            <input type="checkbox" id="contrast" />
+            <span>
+              <span class="theme-name">High contrast</span>
+              <span class="theme-blurb">Remaps dim text and lines; invents no color</span>
+            </span>
+          </label>
+        </div>
+      </aside>
+
+      <main class="stage">
+        <div class="topbar">
+          <span class="t-meta" id="cr-title">Lunar Ash</span>
+          <span class="chip" id="cr-mode">dark</span>
+          <span class="chip" data-tone="think" id="cr-space">Co-think</span>
+          <span class="chip" id="cr-model">Local</span>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn-quiet" id="reset-demos">Reset demos</button>
+        </div>
+
+        <div class="scroll">
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">01</span>
+              <h1 class="t-title-serif">Type</h1>
+            </div>
+            <p class="section-note">
+              Sans for chrome, serif for reading and titles, mono for anything a machine counts. Five sizes:
+              11, 13, 15, 17, 20. Three weights: 400, 500, 600.
+            </p>
+
+            <div class="specimen">
+              <div class="specimen-row">
+                <div class="specimen-label">title 23 serif</div>
+                <div class="t-title-serif">A rehearsed change, then a real one</div>
+              </div>
+              <div class="specimen-row">
+                <div class="specimen-label">title 20 sans</div>
+                <div class="t-title">Changes review</div>
+              </div>
+              <div class="specimen-row">
+                <div class="specimen-label">section 17</div>
+                <div class="t-section-serif">Receipts for this session</div>
+              </div>
+              <div class="specimen-row">
+                <div class="specimen-label">body 13</div>
+                <div class="t-body">
+                  Three files changed. Fourteen checks pass. The receipt is below and the rollback is a hash
+                  comparison, not a promise.
+                </div>
+              </div>
+              <div class="specimen-row">
+                <div class="specimen-label">meta 11</div>
+                <div class="t-meta">CO-WORK · local model · thinking medium · trust dial: ask</div>
+              </div>
+              <div class="specimen-row">
+                <div class="specimen-label">mono</div>
+                <div class="mono">
+                  <span class="timer" id="spec-timer">00:00:00</span> ·
+                  <span class="hash">a41f9c2e8b7d4013</span> · <span class="num">$0.0041</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rail-label" style="padding-left: 0">Reading face — pick one, it becomes --font-serif</div>
+            <div class="serif-grid" id="serifs"></div>
+
+            <div class="demo-box" style="margin-top: var(--sp-3)">
+              <p class="prose">
+                A serif is a delivery decision, not a decoration. At 17px with an optical size axis, the
+                reading face carries a long answer without the interface having to shout. Chrome stays in the
+                sans; anything with a number in it stays in the mono.
+              </p>
+              <p class="prose">
+                Untrusted text arrives in the same face, because the reader has to see that it is text and not
+                a system statement. The label chip above it is what marks provenance: <em>web, untrusted</em>.
+              </p>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">02</span>
+              <h2 class="t-section">Color</h2>
+            </div>
+            <p class="section-note">
+              Each theme defines the same 23 tokens. Accent is a fill only; accent-ink is the same hue pushed to
+              clear 3:1 for glyphs and text. Ratios are measured against the page, not estimated.
+            </p>
+            <div class="swatches" id="swatches"></div>
+            <div class="rail-label" style="padding-left: 0">Contrast floors for this variant</div>
+            <table class="floors">
+              <thead>
+                <tr>
+                  <th>Token</th>
+                  <th>On</th>
+                  <th>Ratio</th>
+                  <th>Floor</th>
+                  <th>Why</th>
+                </tr>
+              </thead>
+              <tbody id="floors"></tbody>
+            </table>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">03</span>
+              <h2 class="t-section">State vocabulary</h2>
+            </div>
+            <p class="section-note">
+              Fifteen states, each with a glyph on the 16px grid, a label, and a reason line. A spinner is not one
+              of them. Only running rotates; only needs-approval breathes.
+            </p>
+            <div class="stack" id="states"></div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">04</span>
+              <h2 class="t-section">Loaders and progress</h2>
+            </div>
+            <p class="section-note">
+              Hover and press are 120ms. Panels are 200ms. Nothing is over 300ms except the two slow ambient
+              loops. Skeletons are static and only appear after 300ms.
+            </p>
+            <div class="demo-box">
+              <div class="demo-row">
+                <div class="think-wrap">
+                  <span class="thinking" data-active="true" id="thinking"></span>
+                  <span class="timer">00:00:07</span>
+                  <span class="chip">thinking: medium</span>
+                </div>
+                <span class="stage-note">shimmer, 1600ms, per glyph</span>
+              </div>
+              <div class="demo-row">
+                <div style="flex: 1">
+                  <div class="loader-hairline"><i></i></div>
+                </div>
+                <span class="stage-note">web search, indeterminate, real query in the row above</span>
+              </div>
+              <div class="demo-row">
+                <span class="loader-dash"></span>
+                <span class="t-body">reading docs.local/policy.md</span>
+                <span class="stage-note">rotating dash, 1000ms</span>
+              </div>
+              <div class="demo-row">
+                <div style="flex: 1" class="stack">
+                  <div class="skeleton" style="width: 72%"></div>
+                  <div class="skeleton" style="width: 48%"></div>
+                </div>
+                <button type="button" class="btn btn-quiet" id="skeleton-reset">Restart 300ms delay</button>
+              </div>
+              <div class="demo-row">
+                <div class="progress" style="flex: 1; --value: 0.64"><i></i></div>
+                <span class="num">64%</span>
+                <span class="stage-note">determinate, scaleX, no reflow</span>
+              </div>
+              <div class="demo-row">
+                <span class="mono">$ npm run verify</span>
+                <span class="caret"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">05</span>
+              <h2 class="t-section">Rehearsed, then real</h2>
+            </div>
+            <p class="section-note">
+              The one deliberate moment: a dashed rehearsal segment turns solid left to right in 200ms when
+              commit actually replays it. Until then the segment stays dashed.
+            </p>
+            <div class="demo-box">
+              <div class="demo-row">
+                <div class="commit" data-phase="rehearsing" id="commit">
+                  <span class="commit-track"></span>
+                  <span class="commit-solid"></span>
+                  <span class="commit-label">rehearsing</span>
+                </div>
+                <button type="button" class="btn" id="commit-next">Commit</button>
+                <span class="stage-note">wipes only on the commit event</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">06</span>
+              <h2 class="t-section">Approval and receipt</h2>
+            </div>
+            <p class="section-note">
+              An approval is a docked bar that rises 8px with the exact effect, target, data class, and rollback
+              class. A rolled-back receipt strikes through and re-stamps its recovery label.
+            </p>
+            <div class="demo-box">
+              <div class="demo-row">
+                <button type="button" class="btn" id="approval-toggle">Raise approval bar</button>
+                <button type="button" class="btn btn-quiet" id="rollback">Roll this receipt back</button>
+              </div>
+              <div id="approval-slot"></div>
+              <div class="receipt" id="receipt" data-recovery="rolled-back">
+                <div class="demo-row" style="align-items: baseline">
+                  <span class="receipt-effect" style="font-family: var(--font-mono); font-size: var(--fs-body)">
+                    write 3 files in apps/desktop
+                  </span>
+                  <span class="receipt-recovery t-meta">rolled back, verified by hash</span>
+                </div>
+                <div class="meta-row" style="margin-top: var(--sp-2)">
+                  <span>grant: file.write · scope: apps/desktop</span>
+                  <span>sha256 a41f9c2e</span>
+                  <span>R1 rollback</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">07</span>
+              <h2 class="t-section">Thread with sub-agents</h2>
+            </div>
+            <p class="section-note">
+              Child rows hang off a 1px line. Each child shows its attenuated grant and its own budget, and rows
+              slide in at most 8px.
+            </p>
+            <div class="panel" style="padding: var(--sp-2)">
+              <div class="state-row state-running">
+                <span class="glyph tone-run" data-glyph="running"></span>
+                <span class="state-label">parent · running</span>
+                <span class="timer">00:00:12</span>
+              </div>
+              <div class="child-rows" id="children"></div>
+              <div class="row" style="padding-left: calc(var(--glyph) + var(--sp-2))">
+                <span class="agents-summary" id="agents-summary">3 agents, 2 done, 1 running</span>
+              </div>
+            </div>
+            <div class="rail-label" style="padding-left: 0">Sources arrive staggered 40ms</div>
+            <div class="source-chips" id="chips"></div>
+            <div class="demo-row" style="margin-top: var(--sp-2)">
+              <button type="button" class="btn btn-quiet" id="chips-reset">Replay stagger</button>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <span class="section-index">08</span>
+              <h2 class="t-section">Motion table</h2>
+            </div>
+            <p class="section-note">
+              Every moment is declared in code and checked by a test: transform and opacity only, one easing
+              curve, no overshoot, and a stated reduced-motion behaviour.
+            </p>
+            <div id="motions"></div>
+          </section>
+        </div>
+      </main>
+
+      <aside class="inspector">
+        <h2>Resolved tokens</h2>
+        <dl class="kv" id="token-list"></dl>
+        <h2 style="margin-top: var(--sp-4)">Floors</h2>
+        <dl class="kv" id="floor-summary"></dl>
+        <h2 style="margin-top: var(--sp-4)">Type</h2>
+        <dl class="kv">
+          <dt>ui</dt>
+          <dd>IBM Plex Sans</dd>
+          <dt>serif</dt>
+          <dd id="serif-name">Source Serif 4</dd>
+          <dt>mono</dt>
+          <dd>JetBrains Mono</dd>
+          <dt>sizes</dt>
+          <dd>11 / 13 / 15 / 17 / 20</dd>
+        </dl>
+        <h2 style="margin-top: var(--sp-4)">Motion</h2>
+        <dl class="kv">
+          <dt>ease</dt>
+          <dd>0.2, 0, 0, 1</dd>
+          <dt>micro</dt>
+          <dd>120ms</dd>
+          <dt>panel</dt>
+          <dd>200ms</dd>
+          <dt>ambient</dt>
+          <dd>1600ms / 1000ms</dd>
+          <dt>reduced</dt>
+          <dd id="reduced">no</dd>
+        </dl>
+        <h2 style="margin-top: var(--sp-4)">Vendored fonts</h2>
+        <dl class="kv" id="font-list"></dl>
+      </aside>
+    </div>
+
+    <div class="foot">
+      <span class="chip" id="variant-chip">lunar-ash / dark</span>
+      <span>Design preview. No backend is running; every animation here is driven by a token, not by an agent.</span>
+      <span class="spacer"></span>
+      <span class="mono" id="status">loading</span>
+    </div>
+  </body>
+</html>

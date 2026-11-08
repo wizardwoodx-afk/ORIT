@@ -1,0 +1,180 @@
+/* State chrome: the 15-state vocabulary rendered on a 16px grid. Color means state, so a tone
+ * token is the only color a glyph may take; nothing here is decorative. */
+
+.glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--glyph);
+  block-size: var(--glyph);
+  flex: 0 0 var(--glyph);
+  color: var(--tone-idle);
+}
+
+.glyph svg {
+  display: block;
+  overflow: visible;
+}
+
+.tone-idle {
+  color: var(--tone-idle);
+}
+.tone-framed {
+  color: var(--tone-framed);
+}
+.tone-run {
+  color: var(--tone-run);
+}
+.tone-wait {
+  color: var(--tone-wait);
+}
+.tone-done {
+  color: var(--tone-done);
+}
+.tone-fail {
+  color: var(--tone-fail);
+}
+.tone-recovered {
+  color: var(--tone-recovered);
+}
+
+/* Only `running` rotates. A waiting ring pulses once per second; everything else is still. */
+.state-running .glyph svg {
+  transform-origin: 50% 50%;
+  animation: dash-spin var(--t-cursor) linear infinite;
+}
+
+@keyframes ring-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.state-needs-approval .glyph svg {
+  animation: ring-breathe var(--t-cursor) var(--ease) infinite;
+}
+
+.state-rolled-back .glyph svg {
+  color: var(--tone-recovered);
+}
+
+.state-partially-completed .glyph svg {
+  color: var(--tone-wait);
+}
+
+.state-drifted .glyph svg {
+  color: var(--tone-wait);
+}
+
+/* Thread row. 28px, glyph, label, reason, right-side meta. */
+.state-row {
+  display: grid;
+  grid-template-columns: var(--glyph) 1fr auto;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--row);
+  padding: 0 var(--sp-2);
+  border-radius: var(--radius-sm);
+}
+
+.state-row:hover {
+  background: var(--hover);
+}
+
+.state-row .state-label {
+  display: block;
+  font-size: var(--fs-body);
+  color: var(--fg);
+}
+
+.state-row .state-reason {
+  display: block;
+  font-size: var(--fs-meta);
+  color: var(--fg-dim);
+}
+
+/* Waiting on a human is the one state allowed an amber edge. */
+.state-row.state-needs-approval {
+  border-left: 1px solid var(--attn);
+}
+
+/* Rehearsed work is drawn dashed until it is real. */
+.rehearsed {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  padding: var(--sp-2);
+}
+
+.rehearsed[data-committed="true"] {
+  border: 1px solid var(--accent-ink);
+}
+
+/* Sub-agent children hang off a 1px vertical line. */
+.child-rows {
+  margin-left: var(--sp-3);
+  padding-left: var(--sp-3);
+  border-left: 1px solid var(--line);
+}
+
+.child-rows .state-row {
+  min-block-size: var(--row);
+}
+
+.agents-summary {
+  font-size: var(--fs-meta);
+  color: var(--fg-dim);
+}
+
+/* Source chips: monochrome domain initials, staggered in at 40ms. No third-party favicons. */
+.source-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.source-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 var(--sp-1);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--fg-dim);
+  animation: row-enter var(--t-panel) var(--ease) both;
+  animation-delay: calc(var(--i, 0) * var(--t-stagger));
+}
+
+/* Diff fills stay muted so text wins. */
+.diff-add {
+  background: var(--diff-add);
+}
+
+.diff-del {
+  background: var(--diff-del);
+}
+
+/* Live-region wrapper: present in the DOM for screen readers, never a toast. */
+.live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-running .glyph svg,
+  .state-needs-approval .glyph svg,
+  .source-chip {
+    animation: none;
+    opacity: 1;
+  }
+}

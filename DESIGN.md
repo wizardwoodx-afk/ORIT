@@ -15,30 +15,64 @@ Dense, quiet, keyboard-first. The interface shows real state and gets out of the
 - **Settings** as a full page like OpenCode: Appearance, Models and routing, Spaces and policy, Memory Center, Skills and tools, Browser (Camofox and ego(lite) separate), Privacy, About with `verify` results.
 
 ## 3. Tokens
-Base `#000000` (AMOLED) with `#0b0b0c / #121214 / #1a1a1d` elevation steps and 1px `#26262a` lines. Text `#e6e6e3` (never pure white), dim `#a3a3a0`, faint `#6b6b69`. Accents appear **only as state**: Co-think bone `#d8d3c8`, Co-work verdigris `#5fa38b`, attention amber `#e0b04f`, danger `#e0605a`. Success is a neutral check plus text, not green. Provide a Graphite theme (`#0e0f11` base) and a light "Paper" theme for bright offices; same tokens, different values. Note: bone and verdigris sit close to the current "tasteful cream and sage" AI tell, so they must never fill panels or headings.
+`apps/desktop/src/renderer/tokens.css` is the only file where raw color may live. Six themes, each in a
+dark and a light mode: **Lunar Ash** (default, AMOLED soft), **Moon** (OpenCode AMOLED neutral),
+**Jupiter** (warm sepia and brass), **Mars** (rust), **Uranus** (deep teal), **Mercury** (warm graphite).
+`data-theme` selects the palette, `data-mode` the mode, and `data-contrast="high"` remaps dim text and
+lines for all six rather than adding a seventh palette. See `docs/adr/0001`.
+
+Every theme defines the same contract: `--bg` page, `--s1` panel, `--s2` elevated control, `--line` and
+`--line-strong` hairlines, `--fg` / `--fg-dim` / `--fg-faint` text, `--btn` and `--btn-fg` primary
+button, `--accent` fill, `--accent-ink` text and glyph accent, `--co-think` and `--co-work` Space tints,
+`--attn` attention, `--danger` failure, `--diff-add` / `--diff-del` fills, `--hover` / `--active` /
+`--selected` / `--scrim` overlays, `--focus` ring.
+
+Rules:
+- Color means state. `--accent` fills selection, focus, and the one commit wipe; it never fills a panel,
+  a heading, or an empty state. `--accent-ink` is the readable form of the same hue and is what glyphs and
+  accent text use.
+- Accents appear only as state: attention amber for needs-approval and blocked, danger for failed,
+  `--co-think` / `--co-work` as a dot or a 1px rule for the Space identity. Success is a neutral check
+  plus text, never green.
+- Contrast floors are measured, not eyeballed: body 7:1, secondary 4.5:1, tertiary and state glyphs 3:1,
+  control border 1.5:1, button label 4.5:1, text on a diff fill 4.5:1. `npm run design:report` fails the
+  build when any theme in either mode misses one.
 
 ## 4. Type, spacing, icons
-- IBM Plex Sans for UI, JetBrains Mono for code, terminal, hashes, timers. Four sizes only: 11 meta, 13 body, 15 section, 20 title. Weights 400/500/600. Tabular numerals for timers, costs, counts.
-- 4px spacing scale. Rows 28px, toolbars 32px, radius 4px controls and 6px panels. No pills.
-- One icon set: Phosphor Regular at 16 and 20px, one stroke weight. Custom state glyphs (running arc, waiting ring, check, cross) drawn on the same 16px grid. No emoji, ever.
+- **UI:** IBM Plex Sans (400/500/600 + italic), for chrome, controls, labels.
+- **Reading:** Source Serif 4 by default, Newsreader and Instrument Serif selectable via `data-serif`
+  (all OFL, vendored as woff2, no CDN). Serif is for titles and long-form answers, never for controls.
+- **Mono:** JetBrains Mono variable, for code, terminal, hashes, timers, costs. Tabular numerals always.
+- Five sizes only: 11 meta, 13 body, 15 section, 17 read, 20 title (23 for the serif display title).
+  Weights 400/500/600. Optical size is on for the serif.
+- Reading set at 17px/1.6, measure 68ch. Conversation chrome stays at 13px.
+- 4px spacing scale. Rows 28px, toolbars 32px, rail 264px (220-360), dock minimum 360px, radius 4px
+  controls and 6px panels. No pills.
+- One icon set: Phosphor Regular at 16 and 20px, one stroke weight. Custom state glyphs (running arc,
+  waiting ring, check, cross) are drawn in code on the same 16px grid. No emoji, ever.
 
 ## 5. State vocabulary (never collapse into a spinner)
 `draft, framed, needs approval, rehearsing, ready to commit, running, verifying, completed, blocked, failed, cancelled, expired, rolled back, partially completed, drifted`. Each has a glyph, a label, and a reason line.
 
 ## 6. Motion and loaders
-Global: only `transform` and `opacity`; micro 120ms, panels 200ms, nothing over 300ms; easing `cubic-bezier(0.2, 0, 0, 1)`; no bounce; pause when the window is hidden; virtualize long lists; honor reduced motion (fades of 1ms and static markers).
-| Moment | Treatment (must be driven by real events) |
-|---|---|
-| Thinking | The word "Thinking" with a slow text shimmer (mask sweep, 1.6s), mono elapsed timer, thinking-level badge, collapsible reasoning summary (never raw hidden reasoning) |
-| Web search | Row with the query, hairline indeterminate bar, source chips appear staggered 40ms as monochrome domain initials (no third-party favicon fetches), live count |
-| Reading a page | One row per URL: queued, loading (short rotating dash), read, blocked. Opens the untrusted snapshot |
-| Sub-agents | Child rows hang off the Thread on a 1px vertical line; glyph per state (arc running, hollow amber ring waiting, drawn check, cross); rows slide in at most 8px; collapsed summary `3 agents, 2 done, 1 running`; Send to background; each child shows its attenuated grant and budget |
-| Tool run | Mono command line, clipped streaming output, stepped cursor, timer, receipt on finish |
-| Rehearsing | Dashed Thread segment and a "Rehearsing" tag: not real yet |
-| Committing | The dashed segment turns solid in a 200ms left-to-right wipe: the one deliberate moment |
-| Needs approval | Docked bar rises 8px with exact effect, target, data, risk, duration, rollback class; amber dot; no modal, no shake |
-| Receipt | Clip-reveal 8px; rolled-back receipts strike through and re-stamp |
-| Loading | Static skeletons only after 300ms; no shimmer except the Thinking label |
+Global: only `transform` and `opacity`; micro 120ms, panels 200ms, nothing over 300ms except the two
+ambient loops (Thinking 1600ms, rotating dash 1000ms); easing `cubic-bezier(0.2, 0, 0, 1)`; no overshoot;
+pause when the window is hidden; virtualize long lists; honor reduced motion (1ms fades, animation off,
+static markers instead of loops). The moments are declared as data in `motion.ts` and a test enforces the
+limits, so a component cannot invent a longer or stranger transition.
+| Moment | Treatment (must be driven by real events) | Implementation |
+|---|---|---|
+| Thinking | The word "Thinking" with a slow shimmer, mono elapsed timer, thinking-level badge, collapsible reasoning summary (never raw hidden reasoning) | `.thinking`, per-glyph opacity step at 1600ms |
+| Web search | Row with the query, hairline indeterminate bar, source chips appear staggered 40ms as monochrome domain initials (no third-party favicon fetches), live count | `.loader-hairline`, `.source-chip` with `--i` |
+| Reading a page | One row per URL: queued, loading (short rotating dash), read, blocked. Opens the untrusted snapshot | `.loader-dash` |
+| Sub-agents | Child rows hang off the Thread on a 1px vertical line; glyph per state; rows slide in at most 8px; collapsed summary `3 agents, 2 done, 1 running`; each child shows its attenuated grant and budget | `.child-rows`, `.enter-row`, `.agents-summary` |
+| Tool run | Mono command line, clipped streaming output, stepped cursor, timer, receipt on finish | `.caret`, `.receipt` |
+| Rehearsing | Dashed Thread segment and a "Rehearsing" tag: not real yet | `.rehearsed`, `.commit-track` |
+| Committing | The dashed segment turns solid in a 200ms left-to-right wipe: the one deliberate moment | `.commit` with `data-phase` |
+| Needs approval | Docked bar rises 8px with exact effect, target, data, risk, duration, rollback class; amber edge; no modal, no shake | `.approval-bar` |
+| Receipt | Reveal of 8px; rolled-back receipts strike through and re-stamp | `.receipt`, `data-recovery="rolled-back"` |
+| Loading | Static skeletons only after 300ms; no shimmer except the Thinking label | `.skeleton` |
+| Progress | Determinate bars scale on `transform`, never reflow | `.progress` with `--value` |
 
 ## 7. Receipts, approvals, and honesty UI
 - Every effectful action renders a **Receipt**: what, why, grant, resource, hash, and the recovery label **Roll back** (R1), **Reverse** (R2), or **Remediate** (R3).
