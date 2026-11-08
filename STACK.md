@@ -18,6 +18,8 @@
 | Web pipeline | `@mozilla/readability`, `turndown`, `linkedom` or `jsdom`, DOMPurify | Verify package names and versions at install |
 | Camofox | `camofox-browser` REST server over Camoufox | Pin commit and binary digest; localhost + API key; telemetry off; about 300MB first-run download, so bundle and verify |
 | Documents | Firecrawl AnyDoc | Verify repo, license, and CLI/Node API at a pinned commit before use |
+| App harness | `apps/server` on `node:http` + SSE, `node:sqlite` ledger, no framework | One origin for the channel and the workbench. ADR 0003 |
+| Renderer bundle | esbuild 0.28.2, dev-only (`npm run build:app`) | Interim until electron-vite; MIT, one binary, 80ms builds |
 | Packaging | electron-builder, `@electron/fuses`, code signing and notarization | Signed auto-update with rollback |
 
 Not used: Rust, Python, Hermes or any agent framework in V1 (see ADR 1 and 2 in AGENTS.md); Rive (cut from V1); paid search APIs by default.

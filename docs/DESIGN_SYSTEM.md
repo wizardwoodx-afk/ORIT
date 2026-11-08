@@ -1,5 +1,9 @@
 # Design system: how to use it
 
+The workbench in `apps/desktop/src/app` renders a live Thread from `apps/server`; the classes below are
+what it uses. Open `npm run app` to see them against real state, and `npm run preview` to see them in
+isolation with every theme and face side by side.
+
 Everything visual is in `apps/desktop/src/renderer/`. Values live in `tokens.css`; nothing else may hold a
 raw color (`RULES` 36, enforced by `npm run slop`). The reasoning is in `docs/adr/0001`.
 
@@ -94,6 +98,8 @@ const delay = staggerDelay(index); // 0, 40, 80 ... capped at 400ms
 | Command | Does |
 | --- | --- |
 | `npm run preview` | serves `apps/desktop/src` at `/preview/` for the live design preview |
+| `npm run app` | builds the workbench and starts the harness at `/app/` on :4180 |
+| `npm run build:app` | bundles `src/app/main.ts` into `dist/app/main.js` (esbuild, ADR 0003) |
 | `npm run design:report` | measures all 12 variants, writes `preview/design-data.json`, fails on a missed floor |
 | `npm run fonts:vendor` | re-fetches the pinned OFL fonts and rewrites `MANIFEST.json` |
 | `npm run slop` | fails on gradients, shadows, blur, emoji, overshoot, off-token colors, radius above 6px |

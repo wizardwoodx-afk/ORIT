@@ -8,15 +8,11 @@
 
 export const THEMES = [
   {
-    id: 'lunar-ash',
-    label: 'Lunar Ash',
-    blurb: 'AMOLED soft. Cool ash greys on true black, the default.',
+    id: 'anvil',
+    label: 'Anvil',
+    blurb: 'SelfImpulse ink. Steel on graphite, the default.',
   },
-  { id: 'moon', label: 'Moon', blurb: 'True OpenCode AMOLED. Neutral, no tint.' },
-  { id: 'jupiter', label: 'Jupiter', blurb: 'Warm sepia and brass. Desk-lamp dark.' },
-  { id: 'mars', label: 'Mars', blurb: 'Rust and dust. Highest thermal warmth.' },
-  { id: 'uranus', label: 'Uranus', blurb: 'Deep teal. Cold, clinical, low glare.' },
-  { id: 'mercury', label: 'Mercury', blurb: 'Warm graphite. Quiet grey, no chrome.' },
+  { id: 'moon', label: 'Moon', blurb: 'True OpenCode AMOLED. Pure black, neutral, retained.' },
 ] as const;
 
 export const MODES = ['dark', 'light'] as const;
@@ -26,7 +22,7 @@ export type ThemeId = (typeof THEMES)[number]['id'];
 export type Mode = (typeof MODES)[number];
 export type SerifId = (typeof SERIFS)[number];
 
-export const DEFAULT_THEME: ThemeId = 'lunar-ash';
+export const DEFAULT_THEME: ThemeId = 'anvil';
 export const DEFAULT_MODE: Mode = 'dark';
 
 /** Every token a theme must define. Missing one is a failing test, not a silent fallback. */

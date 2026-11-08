@@ -56,7 +56,7 @@ describe('token contract', () => {
     for (const theme of THEMES) {
       expect(tokensCss).toContain(`[data-theme="${theme.id}"]`);
     }
-    expect(THEMES).toHaveLength(6);
+    expect(THEMES).toHaveLength(2);
   });
 
   it('rejects a selector outside the supported grammar', () => {
@@ -66,8 +66,8 @@ describe('token contract', () => {
   });
 
   it('keeps the light and dark blocks distinct', () => {
-    const dark = resolveTokens(tokensCss, { ...DEFAULT_CHOICE, theme: 'jupiter', mode: 'dark' });
-    const light = resolveTokens(tokensCss, { ...DEFAULT_CHOICE, theme: 'jupiter', mode: 'light' });
+    const dark = resolveTokens(tokensCss, { ...DEFAULT_CHOICE, theme: 'anvil', mode: 'dark' });
+    const light = resolveTokens(tokensCss, { ...DEFAULT_CHOICE, theme: 'anvil', mode: 'light' });
     expect(dark.get('bg')).not.toBe(light.get('bg'));
     expect(parseHex(light.get('bg') ?? '')).not.toBeNull();
   });
@@ -190,7 +190,7 @@ describe('theme choice', () => {
       getItem: (k) => store.get(k) ?? null,
       setItem: (k, v) => void store.set(k, v),
     };
-    const choice: ThemeChoice = { theme: 'uranus', mode: 'light', serif: 'newsreader', highContrast: true };
+    const choice: ThemeChoice = { theme: 'moon', mode: 'light', serif: 'newsreader', highContrast: true };
     writeChoice(kv, choice);
     expect(readChoice(kv)).toEqual(choice);
   });
@@ -211,10 +211,10 @@ describe('theme choice', () => {
       setAttribute: (k: string, v: string) => void set.set(k, v),
       removeAttribute: (k: string) => void set.delete(k),
     };
-    applyTheme(root, { theme: 'mars', mode: 'dark', serif: 'instrument', highContrast: true });
-    expect(set.get('data-theme')).toBe('mars');
+    applyTheme(root, { theme: 'moon', mode: 'dark', serif: 'instrument', highContrast: true });
+    expect(set.get('data-theme')).toBe('moon');
     expect(set.get('data-contrast')).toBe('high');
-    applyTheme(root, { theme: 'mars', mode: 'dark', serif: 'instrument', highContrast: false });
+    applyTheme(root, { theme: 'moon', mode: 'dark', serif: 'instrument', highContrast: false });
     expect(set.has('data-contrast')).toBe(false);
   });
 

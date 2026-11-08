@@ -1,121 +1,19 @@
-/* The state vocabulary from DESIGN 5. Fifteen states, never collapsed into one spinner.
- * Each state carries a glyph drawn on the 16px grid, a label, a reason line, and the live-region
- * politeness for screen readers. The glyphs are inline SVG strings so they inherit `currentColor`
- * and need no icon font, no sprite, and no network request.
+/**
+ * SelfImpulse — state glyphs.
+ *
+ * The vocabulary lives in `@si/states` so the kernel host and this renderer cannot disagree about
+ * what a state is called. This file adds the drawing: inline SVG on the 16px grid, inheriting
+ * `currentColor`, so a state needs no icon font, no sprite and no network.
  */
+import { STATES, STATE_IDS, type StateId, type StateMeta } from '@si/states';
 
-export const STATE_IDS = [
-  'draft',
-  'framed',
-  'needs-approval',
-  'rehearsing',
-  'ready-to-commit',
-  'running',
-  'verifying',
-  'completed',
-  'blocked',
-  'failed',
-  'cancelled',
-  'expired',
-  'rolled-back',
-  'partially-completed',
-  'drifted',
-] as const;
-
-export type StateId = (typeof STATE_IDS)[number];
-
-export type Tone = 'idle' | 'framed' | 'run' | 'wait' | 'done' | 'fail' | 'recovered';
-
-export type StateMeta = {
-  readonly id: StateId;
-  /** Row label. Lowercase; the UI sentence-cases it where it starts a line. */
-  readonly label: string;
-  /** One line of why, shown under the label. Never a mood, always a fact. */
-  readonly reason: string;
-  readonly tone: Tone;
-  /** True once the state cannot change on its own; loaders stop here. */
-  readonly terminal: boolean;
-  /** Which motion the row is entitled to. `none` means static. */
-  readonly motion: 'none' | 'shimmer' | 'arc' | 'ring' | 'dash' | 'bar' | 'wipe';
-  /** Screen-reader announcement politeness. Routine progress is `off` to avoid a chatty loop. */
-  readonly live: 'off' | 'polite' | 'assertive';
-  /** CSS class the row gets, e.g. `state-needs-approval`. */
-  readonly className: string;
-};
-
-const meta = (
-  id: StateId,
-  label: string,
-  reason: string,
-  tone: Tone,
-  motion: StateMeta['motion'],
-  live: StateMeta['live'],
-  terminal: boolean,
-): StateMeta => ({ id, label, reason, tone, motion, live, terminal, className: `state-${id}` });
-
-export const STATES: Readonly<Record<StateId, StateMeta>> = {
-  draft: meta('draft', 'draft', 'Nothing has run yet.', 'idle', 'none', 'off', false),
-  framed: meta('framed', 'framed', 'The plan is written; it is not approved.', 'framed', 'none', 'polite', false),
-  'needs-approval': meta(
-    'needs-approval',
-    'needs approval',
-    'Waiting for a human signature on the exact effect.',
-    'wait',
-    'ring',
-    'assertive',
-    false,
-  ),
-  rehearsing: meta(
-    'rehearsing',
-    'rehearsing',
-    'Running against a shadow copy. Nothing here is real yet.',
-    'framed',
-    'dash',
-    'polite',
-    false,
-  ),
-  'ready-to-commit': meta(
-    'ready-to-commit',
-    'ready to commit',
-    'The rehearsal matched; commit will replay it.',
-    'done',
-    'none',
-    'polite',
-    false,
-  ),
-  running: meta('running', 'running', 'Executing now.', 'run', 'arc', 'off', false),
-  verifying: meta('verifying', 'verifying', 'Checking the result against the declared checks.', 'framed', 'bar', 'polite', false),
-  completed: meta('completed', 'completed', 'Done, with a receipt.', 'done', 'none', 'polite', true),
-  blocked: meta('blocked', 'blocked', 'Stopped by a rule or a missing prerequisite.', 'wait', 'none', 'assertive', true),
-  failed: meta('failed', 'failed', 'It did not work. The reason is attached.', 'fail', 'none', 'assertive', true),
-  cancelled: meta('cancelled', 'cancelled', 'You stopped it before it finished.', 'idle', 'none', 'polite', true),
-  expired: meta('expired', 'expired', 'The approval window closed.', 'idle', 'none', 'polite', true),
-  'rolled-back': meta('rolled-back', 'rolled back', 'The change was undone and verified by hash.', 'recovered', 'none', 'polite', true),
-  'partially-completed': meta(
-    'partially-completed',
-    'partially completed',
-    'Some effects landed. The rest did not.',
-    'wait',
-    'none',
-    'assertive',
-    true,
-  ),
-  drifted: meta(
-    'drifted',
-    'drifted',
-    'The world changed between rehearsal and commit.',
-    'wait',
-    'none',
-    'assertive',
-    true,
-  ),
-};
+export { STATES, STATE_IDS };
+export type { StateId, StateMeta };
 
 const svg = (body: string, size: number): string =>
   `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="none" stroke="currentColor" ` +
   `stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false">${body}</svg>`;
 
-/** Static glyph paths on the 16px grid. Motion is added by CSS on `.glyph-<state>`. */
 const PATHS: Readonly<Record<StateId, string>> = {
   draft: '<circle cx="8" cy="8" r="5.25" stroke-dasharray="1.5 2.5"/>',
   framed: '<path d="M3 6V3h3M10 3h3v3M13 10v3h-3M6 13H3v-3"/>',
@@ -137,6 +35,9 @@ const PATHS: Readonly<Record<StateId, string>> = {
 export function glyph(state: StateId, size = 16): string {
   return svg(PATHS[state], size);
 }
+
+/** The tone token a state is allowed to use. Color means state. */
+export const toneOf = (state: StateId): string => STATES[state].tone;
 
 /** The row model a list renders: state, label, reason, tone, and the CSS hooks. */
 export function stateRow(state: StateId): {

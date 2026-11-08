@@ -1,0 +1,20 @@
+{
+  "name": "@si/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/main.ts"
+  },
+  "dependencies": {
+    "@si/core": "*",
+    "@si/ledger": "*",
+    "@si/gateway": "*",
+    "@si/grants": "*",
+    "@si/changeset": "*",
+    "@si/classifier": "*",
+    "@si/states": "*",
+    "@si/voice": "*",
+    "zod": "^4.6.7"
+  }
+}

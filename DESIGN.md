@@ -15,22 +15,22 @@ Dense, quiet, keyboard-first. The interface shows real state and gets out of the
 - **Settings** as a full page like OpenCode: Appearance, Models and routing, Spaces and policy, Memory Center, Skills and tools, Browser (Camofox and ego(lite) separate), Privacy, About with `verify` results.
 
 ## 3. Tokens
-`apps/desktop/src/renderer/tokens.css` is the only file where raw color may live. Six themes, each in a
-dark and a light mode: **Lunar Ash** (default, AMOLED soft), **Moon** (OpenCode AMOLED neutral),
-**Jupiter** (warm sepia and brass), **Mars** (rust), **Uranus** (deep teal), **Mercury** (warm graphite).
+`apps/desktop/src/renderer/tokens.css` is the only file where raw color may live. Two themes, each in a
+dark and a light mode: **Anvil** (default, SelfImpulse ink and steel) and **Moon** (true OpenCode AMOLED,
+retained by owner instruction). The reference palettes the workbench was modelled on are gone (ADR 0002).
 `data-theme` selects the palette, `data-mode` the mode, and `data-contrast="high"` remaps dim text and
-lines for all six rather than adding a seventh palette. See `docs/adr/0001`.
+lines across both themes instead of adding a third.
 
-Every theme defines the same contract: `--bg` page, `--s1` panel, `--s2` elevated control, `--line` and
-`--line-strong` hairlines, `--fg` / `--fg-dim` / `--fg-faint` text, `--btn` and `--btn-fg` primary
-button, `--accent` fill, `--accent-ink` text and glyph accent, `--co-think` and `--co-work` Space tints,
-`--attn` attention, `--danger` failure, `--diff-add` / `--diff-del` fills, `--hover` / `--active` /
-`--selected` / `--scrim` overlays, `--focus` ring.
+Every theme defines the same 23-token contract: `--bg` page, `--s1` panel, `--s2` elevated control,
+`--line` and `--line-strong` hairlines, `--fg` / `--fg-dim` / `--fg-faint` text, `--btn` and `--btn-fg`
+primary button, `--accent` fill, `--accent-ink` text and glyph accent, `--co-think` and `--co-work`
+Space tints, `--attn` attention, `--danger` failure, `--diff-add` / `--diff-del` fills, `--hover` /
+`--active` / `--selected` / `--scrim` overlays, `--focus` ring.
 
 Rules:
 - Color means state. `--accent` fills selection, focus, and the one commit wipe; it never fills a panel,
-  a heading, or an empty state. `--accent-ink` is the readable form of the same hue and is what glyphs and
-  accent text use.
+  a heading, or an empty state. `--accent-ink` is the readable form of the same hue and is what glyphs
+  and accent text use.
 - Accents appear only as state: attention amber for needs-approval and blocked, danger for failed,
   `--co-think` / `--co-work` as a dot or a 1px rule for the Space identity. Success is a neutral check
   plus text, never green.

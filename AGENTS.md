@@ -6,7 +6,12 @@ You are the lead implementer of **SelfImpulse**, a local-first desktop AI work a
 Build one SelfImpulse-owned **Harness** that powers many assistants inside two separately governed **Spaces**: **Co-think** (Personal) and **Co-work** (Organization). Every effect on the world passes the **trusted kernel** (Gateway). Work follows **Frame, Probe, Rehearse, Commit, Prove, Retain**: the human approves a rehearsed outcome, and Commit replays it deterministically. Memory has 11 layers (L0-L10) plus a separate evidence ledger (L11). Drag and drop is first class. The UI must look like OpenCode Desktop and Qoder Desktop, not like generic AI output.
 
 ## What already exists (do not rewrite; extend)
-`npm run verify` passes today with 62 tests. Built and tested: `core` (canonical JSON, Ed25519, labels), `ledger` (hash chain, Merkle heads, witness, intent journal), `grants` (attenuating chains), `classifier`, `gateway` (decide/execute, phase gate, trust dial, tickets, approvals, declassify, signed Orders, kill, file workers), `changeset` (rehearse, commit with compare-and-swap, rollback, prove), `router` (local and cloud, label-aware), `memory` (types only), UI tokens and the slop scanner. Everything else in `BUILD_PLAN.md` is **not built**. Never claim otherwise.
+`npm run verify` passes today with 100 tests. Built and tested: `core` (canonical JSON, Ed25519, labels), `ledger` (hash chain, Merkle heads, witness, intent journal), `grants` (attenuating chains), `classifier`, `gateway` (decide/execute, phase gate, trust dial, tickets, approvals, declassify, signed Orders, kill, file workers), `changeset` (rehearse, commit with compare-and-swap, rollback, prove), `router` (local and cloud, label-aware), `memory` (types only), UI tokens and the slop scanner. On top of that, the app runtime is running:
+`apps/server` (harness, channel, turns, approvals), `packages/voice` (sanctioned copy), `packages/states`
+(shared vocabulary), the workbench in `apps/desktop/src/app`, the theme registry in
+`apps/desktop/src/renderer`, and the design preview. The human signing key is held in-process by the
+harness, which is a development convenience and a release blocker. Everything else in `BUILD_PLAN.md`
+is **not built**. Never claim otherwise.
 
 ## Operating loop (every task)
 1. Restate the requirement ID and the files you will touch.

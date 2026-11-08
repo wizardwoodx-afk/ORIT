@@ -15,15 +15,18 @@
     "lint": "biome lint .",
     "test": "vitest run",
     "slop": "node scripts/slop-scan.mjs apps/desktop/src",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run design:report && npm run slop",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run design:report && npm run slop && npm run build:app",
     "demo": "echo demo not built yet; see BUILD_PLAN.md",
     "fonts:vendor": "node scripts/vendor-fonts.mjs",
     "preview": "node scripts/preview-server.mjs",
-    "design:report": "tsx scripts/design-report.mts"
+    "design:report": "tsx scripts/design-report.mts",
+    "build:app": "esbuild apps/desktop/src/app/main.ts --bundle --minify --format=esm --target=es2022 --outfile=apps/desktop/dist/app/main.js",
+    "app": "npm run build:app && tsx apps/server/src/main.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",
     "@types/node": "^22.20.5",
+    "esbuild": "^0.28.2",
     "fast-check": "^4.10.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
