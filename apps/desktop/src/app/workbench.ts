@@ -311,6 +311,7 @@ export class Workbench {
     dial.disabled = true;
     dial.title = 'The dial is set by the Space ceiling; it is not a toggle.';
     dial.innerHTML = `${icon('dial')}<span>dial 3</span>`;
+    dial.setAttribute('aria-label', 'Trust dial, set by the Space ceiling');
     this.dialControl = dial;
 
     controls.append(

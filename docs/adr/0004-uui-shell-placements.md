@@ -43,5 +43,9 @@ that does nothing is worse than an absent control.
 - The workbench imports UUI's placements but no UUI code, so there is no licence coupling and no
   framework in the bundle (467.6 kB, esbuild, no runtime deps).
 - Pane tabs are UUI's arrangement, our vocabulary: `plan`, `receipts`, `ledger`, `files`, `appearance`.
-- Visual verification is still unproven in this environment (no headless browser). The server, HTTP
-  contract, bundle and DOM structure are verified; pixels are not.
+- The shell has a DOM contract, not a screenshot: `apps/desktop/test/workbench.test.ts` builds the real
+  workbench under happy-dom and asserts the titlebar, the 240px start width and 136–640 clamp, the
+  keyboard resize and its persistence, the sidebar and panel toggles, the five panes, the composer
+  region order, Enter-to-send, and that the appearance pane lists all eight themes.
+- Pixel verification is still unproven in this environment (no headless browser): the DOM, HTTP
+  contract and bundle are verified; the rendered image is not.

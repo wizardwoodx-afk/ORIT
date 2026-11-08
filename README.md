@@ -18,7 +18,7 @@ all measured for contrast (`npm run design:report`, 16 variants).
 
 ```
 npm run app        # builds the workbench, starts the harness on :4180  ->  http://localhost:4180/app/
-npm run verify     # typecheck, lint, tests, design report, slop scan, bundle
+npm run verify     # typecheck, lint, 111 tests (incl. a happy-dom shell contract), design report, slop scan, bundle
 npm run preview    # the design preview on :4173  ->  http://localhost:4173/preview/
 ```
 
