@@ -10,12 +10,35 @@ import { ApprovalDesk } from './approvals.ts';
 import { bootSpace, type GovernedSpace } from './boot.ts';
 import { SPACE_IDS, SPACES, type SpaceConfig, type SpaceId } from './spaces.ts';
 import { Thread } from './thread.ts';
+import { AgentTurnRunner } from './agent-turn.ts';
+import { type Brain, type BrainEnv, createBrain, describeBrain } from './model.ts';
 import { TurnRunner } from './turns.ts';
 
 export interface HarnessOptions {
   readonly dataRoot: string;
   readonly now?: () => number;
+  /** Provider configuration. Absent or empty means the deterministic template runs. */
+  readonly env?: BrainEnv;
+  /** Injected provider for tests. Takes precedence over the environment. */
+  readonly brain?: (space: GovernedSpace) => Brain | null;
 }
+
+export type AnyRunner = TurnRunner | AgentTurnRunner;
+
+/** The workspace listing the Files dock and the brain's prompt both read. One implementation. */
+export const listWorkspace = async (root: string): Promise<string[]> => {
+  try {
+    const entries = await readdir(root, { recursive: true, withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile())
+      .map((entry) => join(entry.parentPath ?? '', entry.name).replace(`${root}/`, ''))
+      .filter((path) => !path.split('/').some((part) => part.startsWith('.')))
+      .sort()
+      .slice(0, 200);
+  } catch {
+    return [];
+  }
+};
 
 export type SpaceSnapshot = {
   readonly space: SpaceId;
@@ -39,45 +62,50 @@ export class Harness {
   private constructor(
     readonly spaces: Readonly<Record<SpaceId, GovernedSpace>>,
     readonly threads: Readonly<Record<SpaceId, Thread>>,
-    readonly runners: Readonly<Record<SpaceId, TurnRunner>>,
+    readonly runners: Readonly<Record<SpaceId, AnyRunner>>,
+    readonly brain: string,
   ) {}
 
   static async boot(opts: HarnessOptions): Promise<Harness> {
     const spaces = {} as Record<SpaceId, GovernedSpace>;
     const threads = {} as Record<SpaceId, Thread>;
-    const runners = {} as Record<SpaceId, TurnRunner>;
+    const runners = {} as Record<SpaceId, AnyRunner>;
+    let brainLine = describeBrain(null);
     for (const id of SPACE_IDS) {
       const space = await bootSpace(id, opts);
       const thread = new Thread(join(opts.dataRoot, id, 'thread.jsonl'), opts.now);
       spaces[id] = space;
       threads[id] = thread;
-      runners[id] = new TurnRunner(space, thread, new ApprovalDesk(), opts.now);
+      const brain = opts.brain ? opts.brain(space) : createBrain(opts.env ?? {}, space.ledger);
+      if (brain) {
+        brainLine = describeBrain(brain);
+        const root = space.liveRoot;
+        runners[id] = new AgentTurnRunner(
+          space,
+          thread,
+          new ApprovalDesk(),
+          brain,
+          () => listWorkspace(root),
+          opts.now,
+        );
+      } else {
+        runners[id] = new TurnRunner(space, thread, new ApprovalDesk(), opts.now);
+      }
     }
-    return new Harness(spaces, threads, runners);
+    return new Harness(spaces, threads, runners, brainLine);
   }
 
   thread(space: SpaceId): Thread {
     return this.threads[space];
   }
 
-  runner(space: SpaceId): TurnRunner {
+  runner(space: SpaceId): AnyRunner {
     return this.runners[space];
   }
 
   /** Real workspace listing for the Files dock. Relative paths, bounded, no recursion into dotfiles. */
   async files(space: SpaceId): Promise<string[]> {
-    const root = this.spaces[space].liveRoot;
-    try {
-      const entries = await readdir(root, { recursive: true, withFileTypes: true });
-      return entries
-        .filter((entry) => entry.isFile())
-        .map((entry) => join(entry.parentPath ?? '', entry.name).replace(`${root}/`, ''))
-        .filter((path) => !path.split('/').some((part) => part.startsWith('.')))
-        .sort()
-        .slice(0, 200);
-    } catch {
-      return [];
-    }
+    return listWorkspace(this.spaces[space].liveRoot);
   }
 
   async snapshot(space: SpaceId, since = 0): Promise<SpaceSnapshot> {

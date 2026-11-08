@@ -81,4 +81,5 @@ Triggers (schedule, watchers, calendar and mail events, CI failures, idle review
 |---|---|
 | core, ledger, grants, classifier, gateway, changeset, router | Built and tested |
 | memory | Types only (coordinator, store, retrieval, Memory Center: not built) |
-| skills, harness, lab, web adapters, brain loop, dragdrop, exec worker + sandbox adapter, witness process, desktop shell and workbench, control plane | Not built (see BUILD_PLAN.md) |
+| skills, lab, web adapters, dragdrop, exec worker + sandbox adapter, witness process, control plane | Not built (see BUILD_PLAN.md) |
+| brain loop (`packages/brain`): loop, tool host, governed tools, prompt; providers via the router (Anthropic + OpenAI-compatible) | Built (ADR 0005) |

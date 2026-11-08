@@ -109,7 +109,7 @@ export function createChannel(opts: ChannelOptions): Server {
 
     try {
       if (pathname === '/api/health') {
-        json(res, 200, { ok: true, product: 'SelfImpulse', spaces: ['co-think', 'co-work'] });
+        json(res, 200, { ok: true, product: 'SelfImpulse', spaces: ['co-think', 'co-work'], brain: harness.brain });
         return;
       }
 

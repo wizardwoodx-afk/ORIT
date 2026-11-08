@@ -78,3 +78,23 @@ describe('grant chains', () => {
     expect(covers(leaf, { tool: 'fs.write', op: 'write', resource: 'fs:src/x.ts', dataConf: 'restricted' }).ok).toBe(false);
   });
 });
+
+describe('scheme-wide resource patterns', () => {
+  it('matches everything under the scheme and nothing else', () => {
+    expect(matchesResource('fs:**', 'fs:notes/a.md')).toBe(true);
+    expect(matchesResource('fs:**', 'fs:a.md')).toBe(true);
+    expect(matchesResource('fs:**', 'mail:a@b.test')).toBe(false);
+    expect(matchesResource('shadow:**', 'shadow:notes/deep/x.md')).toBe(true);
+  });
+
+  it('still honours a directory prefix, and treats it as narrower', () => {
+    expect(matchesResource('fs:notes/**', 'fs:notes/a.md')).toBe(true);
+    expect(matchesResource('fs:notes/**', 'fs:other/a.md')).toBe(false);
+    expect(patternSubset('fs:notes/**', 'fs:**')).toBe(true);
+    expect(patternSubset('fs:**', 'fs:notes/**')).toBe(false);
+  });
+
+  it('refuses an unsafe target through a scheme-wide pattern', () => {
+    expect(matchesResource('fs:**', 'fs:../etc/passwd')).toBe(false);
+  });
+});

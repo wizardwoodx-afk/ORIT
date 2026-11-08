@@ -10,7 +10,19 @@ with authority, and nothing outside the Gateway touches the world.
 
 ## What runs today
 
-The shell's geometry is UUI's (`Erealunetra/UUI`): 36px titlebar, 240px sidebar that resizes 136–640,
+The brain is a governed loop (`packages/brain`): it calls a provider, runs the tools it was offered, and
+feeds observations back — but every tool is a broker call, writes land in the shadow copy, and nothing it
+proposes becomes real until a human signs the exact change set. Two provider families are wired
+(Anthropic, and any OpenAI-compatible endpoint such as Ollama or llama.cpp), and the agent prompt lives
+in one file: `packages/brain/src/prompt.ts`.
+
+```
+SI_PROVIDER=anthropic SI_MODEL=claude-sonnet-4-5 SI_API_KEY=... npm run app
+SI_PROVIDER=openai SI_MODEL=qwen2.5-coder SI_BASE_URL=http://127.0.0.1:11434/v1 npm run app
+```
+
+With nothing set, `/api/health` reports `deterministic planner (no provider configured)` and the template
+turn runs instead. The shell's geometry is UUI's (`Erealunetra/UUI`): 36px titlebar, 240px sidebar that resizes 136–640,
 panels inset 8px on the deep background, session panel docked at 400px minimum, composer pinned under
 the timeline. The paint, the motion and the themes are ours. Eight themes — Lunar Ash (default), Anvil,
 Moon, Jupiter, Mars, Uranus, Mercury, and AMOLED imported from UUI's theme set — each in dark and light,
@@ -18,7 +30,7 @@ all measured for contrast (`npm run design:report`, 16 variants).
 
 ```
 npm run app        # builds the workbench, starts the harness on :4180  ->  http://localhost:4180/app/
-npm run verify     # typecheck, lint, 111 tests (incl. a happy-dom shell contract), design report, slop scan, bundle
+npm run verify     # typecheck, lint, 141 tests (incl. a happy-dom shell contract), design report, slop scan, bundle
 npm run preview    # the design preview on :4173  ->  http://localhost:4173/preview/
 ```
 

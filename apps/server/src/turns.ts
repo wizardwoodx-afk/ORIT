@@ -1,27 +1,29 @@
 /**
- * SelfImpulse — turns.
+ * SelfImpulse — the deterministic turn.
  *
- * One turn is Frame, Probe, Rehearse, Commit, Prove, Retain. The planner here is deterministic and
- * local: it turns a request into a real ChangeSet against a shadow copy, stops at a human signature,
- * then replays exactly what was signed through the gateway. No model is called, so nothing is
- * pretending to be intelligence; the governance path is what this exercises.
+ * Frame, Rehearse, Commit, Prove, Retain with no model in the loop. The plan is derived from the
+ * request by a local template: it proves the governance path end to end, and it is the fallback the
+ * harness uses when no provider is configured, so the product always has one honest way to work.
  */
-import { type ToolCall, randomId, signString } from '@si/core';
-import { type Check, Rehearsal, commitChangeSet, prove, scopeForChangeSet, verifyChangeSetIntegrity } from '@si/changeset';
-import type { Broker, Detent, OrderAuthority, OrderRevision, ScopeEntry, Session } from '@si/gateway';
-import { approvalPayload, argsHashOf, humanSign, makeRevision } from '@si/gateway';
+import { randomId } from '@si/core';
+import { Rehearsal, verifyChangeSetIntegrity } from '@si/changeset';
+import type { OrderAuthority, OrderRevision, ScopeEntry } from '@si/gateway';
+import { makeRevision } from '@si/gateway';
 import { SIGNATURE, say } from '@si/voice';
 import type { ApprovalDesk } from './approvals.ts';
 import type { GovernedSpace } from './boot.ts';
-import type { NewEvent, PlanStep, Thread } from './thread.ts';
+import type { PlanStep, Thread } from './thread.ts';
+import { type LandStatus, REASON_FOR, GovernedTurn } from './turn-core.ts';
 import type { StateId } from '@si/states';
 
-export interface TurnResult {
+export type TurnResult = {
   readonly turnId: string;
-  readonly state: 'completed' | 'cancelled' | 'expired' | 'failed' | 'drifted';
-}
+  readonly state: Exclude<LandStatus, 'partially-completed'> | 'partially-completed';
+};
 
-const slugOf = (text: string): string => {
+export { REASON_FOR };
+
+export const slugOf = (text: string): string => {
   const slug = text
     .toLowerCase()
     .normalize('NFKD')
@@ -38,7 +40,7 @@ const titleOf = (text: string): string => {
 };
 
 /** The note this turn writes. Content is derived only from the request, never from a model. */
-const noteFor = (text: string): string =>
+export const noteFor = (text: string): string =>
   [
     `# ${titleOf(text)}`,
     '',
@@ -51,13 +53,10 @@ const noteFor = (text: string): string =>
     '',
   ].join('\n');
 
-export class TurnRunner {
-  constructor(
-    private readonly space: GovernedSpace,
-    private readonly thread: Thread,
-    readonly approvals: ApprovalDesk,
-    private readonly now: () => number = Date.now,
-  ) {}
+export class TurnRunner extends GovernedTurn {
+  constructor(space: GovernedSpace, thread: Thread, approvals: ApprovalDesk, now: () => number = Date.now) {
+    super(space, thread, approvals, now);
+  }
 
   /** Starts a turn and returns immediately; the Thread is the channel the client follows. */
   start(text: string): { turnId: string } {
@@ -73,24 +72,13 @@ export class TurnRunner {
     void this.run(turnId, text).catch((error: unknown) => {
       const message = error instanceof Error ? error.message : 'unknown error';
       this.thread.append({ type: 'notice', turnId, text: say.failed('TurnRunner', message), tone: 'danger' });
-      this.state(turnId, 'node', 'failed');
+      this.state(turnId, 'node', 'failed' satisfies StateId);
     });
     return { turnId };
   }
 
-  private state(turnId: string, nodeId: string, state: StateId): void {
-    const event: NewEvent = {
-      type: 'state',
-      turnId,
-      nodeId,
-      state,
-      reason: REASON_FOR[state],
-    };
-    this.thread.append(event);
-  }
-
   private async run(turnId: string, text: string): Promise<void> {
-    const { gw, orders, human, agent, config } = this.space;
+    const { gw, orders, agent, config } = this.space;
     const path = `notes/${slugOf(text)}.md`;
     const content = noteFor(text);
     const authorityBase: Omit<OrderAuthority, 'scope' | 'changeSetHash'> = {
@@ -128,7 +116,7 @@ export class TurnRunner {
       { tool: 'shadow.write', ops: ['write'], resource: `shadow:${path}` },
     ];
 
-    const rev0 = makeRevision(`${config.id}-${turnId}`, 0, { ...authorityBase, scope: sandboxScope }, {
+    const rev0: OrderRevision = makeRevision(`${config.id}-${turnId}`, 0, { ...authorityBase, scope: sandboxScope }, {
       phase: 'rehearse',
       path,
     });
@@ -145,150 +133,6 @@ export class TurnRunner {
 
     this.thread.append({ type: 'plan', turnId, steps: planSteps, changeSetHash: cs.hash });
 
-    const expiresAt = this.now() + 5 * 60_000;
-    const request = this.approvals.request(
-      {
-        turnId,
-        effect: 'write',
-        target: path,
-        paths: cs.ops.map((o) => o.path),
-        changeSetHash: cs.hash,
-        recoveryClass: 'R1',
-        risk: 'reversible from stored before-content',
-        dataClass: config.policyCeiling,
-        expiresAt,
-      },
-      this.now(),
-    );
-    this.thread.append({ type: 'approval', turnId, approval: request.view });
-    this.state(turnId, 'approve', 'needs-approval');
-
-    const decision = await request.decided;
-    if (decision === 'denied') {
-      this.state(turnId, 'approve', 'cancelled');
-      this.thread.append({ type: 'notice', turnId, text: say.cancelled(), tone: 'info' });
-      this.space.ledger.append('approval.denied', 'human', { turnId, changeSetHash: cs.hash });
-      return;
-    }
-    if (decision === 'expired') {
-      this.state(turnId, 'approve', 'expired');
-      this.thread.append({ type: 'notice', turnId, text: say.expired(), tone: 'attn' });
-      return;
-    }
-
-    this.space.ledger.append('approval.signed', human.id, { turnId, changeSetHash: cs.hash });
-
-    // Class B: the human signed over the exact rehearsed outcome, so the revision carries its hash.
-    const rev1 = makeRevision(
-      rev0.orderId,
-      1,
-      { ...authorityBase, scope: scopeForChangeSet(cs), changeSetHash: cs.hash },
-      { phase: 'commit', paths: cs.ops.map((o) => o.path), changeSetHash: cs.hash },
-      rev0,
-    );
-    rev1.signatures.push(humanSign(rev1, human));
-    orders.activate(rev1);
-    gw.activateBudget(rev1);
-    const session1 = this.session(rev1, agent.publicB64, 'COMMIT', gw.mintGrants(rev1, agent.publicB64));
-
-    this.state(turnId, 'commit', 'running');
-    // A Space whose trust dial asks per live edit gets a signature bound to that exact call and its
-    // argument hash. The harness holds the human key in this build; the keychain takes it at release.
-    const authorize = (call: ToolCall): void => {
-      const argsHash = argsHashOf(call.args);
-      const sig = signString(human.privateKey, approvalPayload({ kind: 'approve', callId: call.id, argsHash }));
-      gw.addApproval({ kind: 'approve', callId: call.id, argsHash, keyId: human.id, sig });
-    };
-    const commit = await commitChangeSet(gw.broker(session1), cs, 'commit', authorize);
-
-    if (commit.status !== 'committed') {
-      const state = commit.status === 'drifted' ? 'drifted' : 'failed';
-      this.state(turnId, 'commit', state);
-      this.thread.append({
-        type: 'notice',
-        turnId,
-        text: commit.status === 'drifted' ? say.doneWithDrift(commit.drifted) : say.failed('Commit', commit.reason ?? 'unknown'),
-        tone: 'danger',
-      });
-      return;
-    }
-
-    this.state(turnId, 'prove', 'verifying');
-    session1.phase = 'PROVE';
-    const broker1: Broker = gw.broker(session1);
-    const checks: Check[] = cs.ops.map((op) => ({
-      id: `content-matches:${op.path}`,
-      run: async (view) => {
-        const actual = await view.read(op.path);
-        const pass = actual === op.after;
-        return { pass, detail: pass ? 'content matches the rehearsed hash' : 'content differs from the rehearsal' };
-      },
-    }));
-    const report = await prove(broker1, cs, checks);
-
-    for (const [index, seq] of commit.receipts.entries()) {
-      const event = this.space.ledger.events(seq, seq)[0];
-      const op = cs.ops[index];
-      if (!event || !op) continue;
-      this.thread.append({
-        type: 'receipt',
-        turnId,
-        receipt: {
-          seq: index + 1,
-          effect: 'write',
-          target: op.path,
-          recoveryClass: 'R1',
-          grantId: String(event.body.grantId ?? ''),
-          afterHash: op.afterHash,
-          hash: event.hash,
-          ledgerSeq: event.seq,
-        },
-      });
-    }
-    for (const check of report.checks) this.thread.append({ type: 'check', turnId, ...check });
-
-    const head = this.space.ledger.seal(this.space.witness);
-    if (head) this.thread.append({ type: 'notice', turnId, text: say.receipt(head.toSeq, head.root), tone: 'info' });
-
-    const passed = report.checks.filter((c) => c.pass).length;
-    const final = report.verdict === 'verified' ? 'completed' : 'partially-completed';
-    this.state(turnId, 'prove', final);
-    this.thread.append({
-      type: 'message',
-      turnId,
-      actor: 'assistant',
-      text: say.done(commit.applied, passed, report.checks.length),
-      conf: config.policyCeiling,
-      integrity: 'trusted',
-    });
-  }
-
-  private session(rev: OrderRevision, subjectPubB64: string, phase: Session['phase'], chains: Session['chains']): Session {
-    return this.space.gw.openSession({
-      orderId: rev.orderId,
-      callerPubB64: subjectPubB64,
-      dial: this.space.config.dial as Detent,
-      phase,
-      chains,
-    });
+    await this.land({ turnId, changeSet: cs, rev0, authorityBase });
   }
 }
-
-/** The reason line a state row carries. Kept next to the runner so a state cannot appear bare. */
-const REASON_FOR: Readonly<Record<StateId, string>> = {
-  draft: 'Nothing has run yet.',
-  framed: 'The plan is written; it is not approved.',
-  'needs-approval': 'Waiting for a human signature on the exact effect.',
-  rehearsing: 'Running against a shadow copy. Nothing here is real yet.',
-  'ready-to-commit': 'The rehearsal matched; commit will replay it.',
-  running: 'Replaying the signed ChangeSet through the gateway.',
-  verifying: 'Re-reading the live files and re-running the checks.',
-  completed: 'Done, with a receipt.',
-  blocked: 'Stopped by a rule or a missing prerequisite.',
-  failed: 'It did not work. The reason is attached.',
-  cancelled: 'You stopped it before it finished.',
-  expired: 'The approval window closed.',
-  'rolled-back': 'The change was undone and verified by hash.',
-  'partially-completed': 'Some effects landed. The rest did not.',
-  drifted: 'The world changed between rehearsal and commit.',
-};

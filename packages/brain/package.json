@@ -1,1 +1,19 @@
-{"name":"@si/brain","version":"0.0.0","private":true,"type":"module","exports":{".":"./src/index.ts"},"dependencies":{"@si/core":"*","@si/gateway":"*","@si/changeset":"*","@si/router":"*","@si/classifier":"*","@si/ledger":"*","@si/grants":"*"}}
+{
+  "name": "@si/brain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@si/core": "*",
+    "@si/gateway": "*",
+    "@si/changeset": "*",
+    "@si/router": "*",
+    "@si/classifier": "*",
+    "@si/ledger": "*",
+    "@si/grants": "*",
+    "@si/voice": "*"
+  }
+}

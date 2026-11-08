@@ -13,7 +13,7 @@ const port = Number(process.env.PORT ?? 4180);
 const host = process.env.HOST ?? '0.0.0.0';
 const dataRoot = resolve(process.env.SI_DATA ?? '.selfimpulse');
 
-const harness = await Harness.boot({ dataRoot });
+const harness = await Harness.boot({ dataRoot, env: process.env });
 const server = createChannel({
   harness,
   roots: [resolve('apps/desktop/dist'), resolve('apps/desktop/src')],
@@ -22,6 +22,7 @@ const server = createChannel({
 
 server.listen(port, host, () => {
   console.log(`${SIGNATURE.product} harness on http://${host}:${port}/app/  (data ${dataRoot})`);
+  console.log(`brain: ${harness.brain}`);
   console.log(`${SIGNATURE.mark} ${SIGNATURE.tagline}`);
 });
 

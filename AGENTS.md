@@ -6,9 +6,10 @@ You are the lead implementer of **SelfImpulse**, a local-first desktop AI work a
 Build one SelfImpulse-owned **Harness** that powers many assistants inside two separately governed **Spaces**: **Co-think** (Personal) and **Co-work** (Organization). Every effect on the world passes the **trusted kernel** (Gateway). Work follows **Frame, Probe, Rehearse, Commit, Prove, Retain**: the human approves a rehearsed outcome, and Commit replays it deterministically. Memory has 11 layers (L0-L10) plus a separate evidence ledger (L11). Drag and drop is first class. The UI must look like OpenCode Desktop and Qoder Desktop, not like generic AI output.
 
 ## What already exists (do not rewrite; extend)
-`npm run verify` passes today with 111 tests. Built and tested: `core` (canonical JSON, Ed25519, labels), `ledger` (hash chain, Merkle heads, witness, intent journal), `grants` (attenuating chains), `classifier`, `gateway` (decide/execute, phase gate, trust dial, tickets, approvals, declassify, signed Orders, kill, file workers), `changeset` (rehearse, commit with compare-and-swap, rollback, prove), `router` (local and cloud, label-aware), `memory` (types only), UI tokens and the slop scanner. On top of that, the app runtime is running:
+`npm run verify` passes today with 141 tests. Built and tested: `core` (canonical JSON, Ed25519, labels), `ledger` (hash chain, Merkle heads, witness, intent journal), `grants` (attenuating chains), `classifier`, `gateway` (decide/execute, phase gate, trust dial, tickets, approvals, declassify, signed Orders, kill, file workers), `changeset` (rehearse, commit with compare-and-swap, rollback, prove), `router` (local and cloud, label-aware), `memory` (types only), UI tokens and the slop scanner. On top of that, the app runtime is running:
 `apps/server` (harness, channel, turns, approvals), `packages/voice` (sanctioned copy), `packages/states`
-(shared vocabulary), the workbench in `apps/desktop/src/app` — shell placements ported from UUI
+(shared vocabulary), the governed brain loop in `packages/brain` (ADR 0005; providers via the router,
+scripted provider in tests), the workbench in `apps/desktop/src/app` — shell placements ported from UUI
 (`Erealunetra/UUI`), see ADR 0004, with a 10-test DOM contract under happy-dom — the theme registry in
 `apps/desktop/src/renderer` (8 themes × 2 modes, AMOLED imported from UUI per ADR 0002), and the design
 preview. The human signing key is held in-process by the
