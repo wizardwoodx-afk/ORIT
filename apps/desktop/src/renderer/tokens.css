@@ -1,0 +1,39 @@
+/* SelfImpulse design tokens. The slop scanner treats this file as the only place raw colors may live. */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --s1: #0b0b0c;
+  --s2: #121214;
+  --s3: #1a1a1d;
+  --line: #26262a;
+  --line-strong: #34343a;
+  --fg: #e6e6e3;
+  --fg-dim: #a3a3a0;
+  --fg-faint: #6b6b69;
+  --co-think: #d8d3c8;
+  --co-work: #5fa38b;
+  --attn: #e0b04f;
+  --danger: #e0605a;
+  --diff-add: #1f3a2d;
+  --diff-del: #3d2221;
+
+  --font-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --fs-meta: 11px;
+  --fs-body: 13px;
+  --fs-section: 15px;
+  --fs-title: 20px;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --row: 28px;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --t-micro: 120ms;
+  --t-panel: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-micro: 1ms;
+    --t-panel: 1ms;
+  }
+}

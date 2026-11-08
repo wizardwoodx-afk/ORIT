@@ -1,0 +1,1 @@
+{"name":"@si/cli","version":"0.0.0","private":true,"type":"module","dependencies":{"@si/core":"*","@si/gateway":"*","@si/brain":"*","@si/changeset":"*","@si/router":"*","@si/ledger":"*","@si/grants":"*","@si/classifier":"*"}}
