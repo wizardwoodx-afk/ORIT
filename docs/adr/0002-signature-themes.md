@@ -1,6 +1,6 @@
-# ADR 0002: SelfImpulse signature themes; reference palettes removed
+# ADR 0002: The palette set stays; AMOLED is imported from UUI
 
-- Status: accepted
+- Status: accepted (supersedes the two-theme decision of the same number, 2026-11-08)
 - Date: 2026-11-08
 - Deciders: owner
 - Supersedes in part: ADR 0001 (theme registry)
@@ -8,51 +8,83 @@
 ## Context
 
 ADR 0001 shipped six palettes that came from a reference interface: Lunar Ash, Moon, Jupiter, Mars,
-Uranus, Mercury. The owner's instruction for this pass was specific: use the layout and placements of
-the reference workbench, remove its theme colors, and keep the AMOLED theme. A product that wears another
-product's palette is not branded, it is borrowed.
+Uranus, Mercury. In the first pass of this slice the owner asked to keep only AMOLED, and a two-theme
+registry was written (Anvil + Moon) with the other four deleted. The owner then corrected the
+instruction: the palettes were to stay — Mars, Uranus, Mercury, Jupiter "and all of them" — and the
+source interface turned out to be a real, public repository (`Erealunetra/UUI`), so its theme set was
+also available to read rather than guess at.
+
+This ADR records both the attempt and the reversal, because the reasoning that produced the deletion is
+still the reasoning that has to be answered: a product that wears another product's palette is borrowed,
+not branded.
 
 ## Decision
 
-The registry is now two themes:
+The registry is eight themes, each in a dark and a light mode (16 measured variants):
 
-| Theme | Modes | Why it exists |
+| Theme | Source | Note |
 | --- | --- | --- |
-| **Anvil** (default) | dark, light | SelfImpulse's own. Ink-graphite canvas, steel accent, chalk and slate Space tints. The light mode is the "paper for bright rooms" mode. |
-| **Moon** | dark, light | Retained by owner instruction. True AMOLED, pure black, neutral. |
+| **Lunar Ash** (default) | owner palette | AMOLED soft. Cool ash on near-black. |
+| **Anvil** | SelfImpulse | House palette. Ink-graphite canvas, steel accent, chalk/slate Space tints. |
+| **Moon** | owner palette | True AMOLED, pure black, neutral. |
+| **Jupiter** | owner palette | Warm sepia and brass. |
+| **Mars** | owner palette | Rust and dust. |
+| **Uranus** | owner palette | Deep teal, cold and low glare. |
+| **Mercury** | owner palette | Warm graphite. |
+| **AMOLED** | **imported from UUI** (`src/theme/themes/amoled.json`) | The only UUI palette carried across. |
 
-Removed: `lunar-ash`, `jupiter`, `mars`, `uranus`, `mercury`. Their values are gone from `tokens.css`,
-from `THEMES`, and from the report. Nothing was renamed to hide the removal.
+Nothing named "removed" is removed. The six owner palettes are restored with the values they had, and
+`anvil` remains the house theme.
 
-What replaced the "brand color" job the removed palettes did:
+### What "imported from UUI" means precisely
 
-- **Type is the identity.** The reading face (Source Serif 4, with Newsreader and Instrument Serif
-  selectable) carries titles and answers; the sans carries chrome; the mono carries anything counted.
-  A competitor's green dot is not what makes this product recognisable; the serif line and the
-  `//impulse` mark are.
-- **The mark.** `//impulse` appears in the app header, the footer of the design preview, and as the
-  signature line written into any file a turn produces.
-- **The impulse line.** A 1px rule down the left of the Thread that is still by default and breathes
-  only while a turn is genuinely active. It is a state display, not an ornament.
-- **Voice as code.** `packages/voice` holds the sanctioned strings and a list of words the product does
-  not use. A test fails if a status line contains one.
+UUI's theme file supplies a ten-key palette per mode: `neutral, ink, primary, accent, success, warning,
+error, info, diffAdd, diffDelete`. Our contract is 23 tokens, so the palette is mapped and the surface
+steps are derived:
 
-Anvil tokens (dark): `--bg #0a0a0b`, `--s1 #111113`, `--s2 #18181b`, `--fg #ecece8`, `--fg-dim #a6a6a1`,
-`--accent/--accent-ink #a9b4c2`, `--co-think #c8bfae`, `--co-work #7e9aa8`, `--attn #e0b04f`,
-`--danger #e0605a`.
-Anvil tokens (light): `--bg #f5f4f1`, `--s1 #ffffff`, `--s2 #ecebe7`, `--fg #191a1c`, `--fg-dim #575a5e`,
-`--accent #a9b4c2` (fill only), `--accent-ink #4c5f72` (light mode needs the darker form to clear 3:1).
+| our token | from UUI | value (dark) | value (light) |
+| --- | --- | --- | --- |
+| `--bg` | `neutral` | `#000000` | `#f0f0f0` |
+| `--s1` / `--s2` | derived steps | `#0a0a0a` / `#121212` | `#ffffff` / `#e4e4e4` |
+| `--line` / `--line-strong` | derived hairlines | `#242424` / `#3d3d3d` | `#cfcfcf` / `#a6a6a6` |
+| `--fg` | `ink` | `#ffffff` | `#0a0a0a` |
+| `--fg-dim` / `--fg-faint` | derived from `ink` | `#a8a8a8` / `#767676` | `#4a4a4a` / `#666666` |
+| `--accent` / `--accent-ink` | `primary` | `#b388ff` / `#b388ff` | `#6200ff` / `#5a00e8` |
+| `--btn` / `--btn-fg` | `ink` / `neutral` | `#ffffff` / `#000000` | `#0a0a0a` / `#f0f0f0` |
+| `--co-think` | `primary` | `#b388ff` | `#5a00e8` |
+| `--co-work` | `info` | `#18ffff` | `#005f8f` (darkened from `#00b0ff`) |
+| `--attn` | `warning` | `#ffea00` | `#7a5000` (darkened from `#ffab00`) |
+| `--danger` | `error` | `#ff5252` (lifted from `#ff1744`) | `#b3122f` (darkened from `#ff1744`) |
+
+Three of UUI's light values fail our floors on their own `#f0f0f0` page: `success #00e676` is 1.4:1,
+`warning #ffab00` is 1.5:1, `error #ff1744` is 3.4:1 against the 4.5:1 a state glyph needs. The raw
+values are recorded above rather than quietly replaced, and the derived steps are what ship.
+`npm run design:report` measures all 16 variants; every floor passes.
+
+UUI's other 35 palettes are not imported. One import proves the path and keeps the promise that the
+borrowed set is deliberate; 35 more would be 35 unmeasured surface derivations wearing someone else's
+names.
+
+### Why the reversal does not dissolve the branding question
+
+The deletion argued that palettes alone cannot carry identity. That argument stands; the conclusion drawn
+from it did not. Identity is carried by, and measured as:
+
+- **Type.** Source Serif 4 (with Newsreader and Instrument Serif selectable) for titles and answers, sans
+  for chrome, mono for anything counted.
+- **The mark.** `//impulse` in the sidebar brand row, the preview footer, and the signature line written
+  into any file a turn produces.
+- **The impulse line.** A 1px rule down the Thread that is still by default and breathes only while a
+  turn is genuinely active — a state display, not an ornament.
+- **Voice as code.** `packages/voice` holds sanctioned strings and a list of words the product does not
+  use; a test fails if a status line contains one.
+
+So the palettes are a wardrobe, not a face. The face is the serif line, the mark, the impulse line, and
+the refusal to lie about state.
 
 ## Consequences
 
-- Four variants instead of twelve. Same floors, same test, fewer palettes to keep honest.
-- Anyone who preferred Jupiter or Mars is out of luck by owner decision, not by accident. Restoring one
-  is a two-block edit in `tokens.css` plus a registry entry and `npm run design:report`.
-- The high-contrast modifier still remaps semantics, so it works across both themes without new values.
-- Moon keeps its light mode for parity; an AMOLED theme is dark by nature, but a half-defined theme is
-  worse than an unused mode.
-
-## Verification
-
-`npm run verify` passes: typecheck, Biome, 100 tests, `design:report` with all contrast floors met
-across 4 variants, clean slop scan, and the app bundle builds.
+- `tokens.css` carries 8 themes × 2 modes; `THEMES` must track it and the drift test enforces that.
+- `design:report` now reports 16 variants; the build fails if any one of them misses a floor.
+- The appearance pane lists all eight, because a theme nobody can select is a theme nobody has.
+- Adding a ninth theme means 23 tokens in two modes and a passing report — the cost is explicit.

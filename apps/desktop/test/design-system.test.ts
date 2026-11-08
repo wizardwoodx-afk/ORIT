@@ -56,7 +56,7 @@ describe('token contract', () => {
     for (const theme of THEMES) {
       expect(tokensCss).toContain(`[data-theme="${theme.id}"]`);
     }
-    expect(THEMES).toHaveLength(2);
+    expect(THEMES).toHaveLength(8);
   });
 
   it('rejects a selector outside the supported grammar', () => {

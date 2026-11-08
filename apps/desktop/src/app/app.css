@@ -2,7 +2,7 @@
 
 .wb {
   display: grid;
-  grid-template-rows: var(--toolbar) minmax(0, 1fr);
+  grid-template-rows: var(--titlebar) minmax(0, 1fr);
   height: 100vh;
   background: var(--bg);
   color: var(--fg);
@@ -12,9 +12,9 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: 0 var(--sp-3);
+  padding: 0 var(--sp-2);
   border-bottom: 1px solid var(--line);
-  background: var(--s1);
+  background: var(--bg);
 }
 
 .brand {
@@ -38,22 +38,28 @@
 
 .wb-body {
   display: grid;
-  grid-template-columns: var(--rail) minmax(0, 1fr) var(--dock-min);
+  grid-template-columns: var(--rail-w, var(--rail)) minmax(0, 1fr) var(--dock-w, var(--dock-min));
+  gap: var(--inset);
+  padding: var(--inset);
   min-height: 0;
 }
 
 /* ---------- rail ---------- */
 .wb-rail {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--s1);
   min-height: 0;
+  overflow: hidden;
 }
 
 .rail-head {
-  overflow-y: auto;
-  padding: var(--sp-2);
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
 }
 
 .rail-label {
@@ -154,11 +160,11 @@
 }
 
 .rail-foot {
-  padding: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
   border-top: 1px solid var(--line);
   font-family: var(--font-serif);
-  font-size: var(--fs-body);
-  line-height: 1.45;
+  font-size: var(--fs-meta);
+  line-height: 1.5;
   color: var(--fg-dim);
 }
 
@@ -171,7 +177,10 @@
 }
 
 .tabs {
+  display: flex;
+  align-items: center;
   gap: var(--sp-2);
+  padding: 0 var(--sp-3);
   border-bottom: 1px solid var(--line);
   background: var(--s1);
 }
@@ -403,9 +412,12 @@
 
 /* ---------- composer ---------- */
 .composer {
-  border-top: 1px solid var(--line);
-  background: var(--s1);
-  padding: var(--sp-2) var(--sp-3) var(--sp-2);
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--s2);
 }
 
 .composer textarea {
@@ -442,27 +454,32 @@
 .wb-dock {
   display: flex;
   flex-direction: column;
-  border-left: 1px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--s1);
   min-height: 0;
+  overflow: hidden;
 }
 
 .dock-tabs {
   display: flex;
+  align-items: center;
+  gap: var(--sp-1);
   height: var(--toolbar);
+  padding: 0 var(--sp-1);
   border-bottom: 1px solid var(--line);
   border-radius: 0;
-  border-left: 0;
-  border-right: 0;
-  border-top: 0;
+  background: var(--bg);
 }
 
 .dock-tabs button {
-  flex: 1;
-  min-height: var(--toolbar);
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 22px;
+  padding: 0 6px;
   font-size: var(--fs-meta);
   color: var(--fg-dim);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
 }
 
 .dock-tabs button[aria-pressed="true"] {
@@ -516,8 +533,9 @@
 
 @media (max-width: 1200px) {
   .wb-body {
-    grid-template-columns: 220px minmax(0, 1fr) 300px;
+    grid-template-columns: var(--rail-w, 220px) minmax(0, 1fr) min(320px, 34vw);
   }
+}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -525,4 +543,419 @@
     animation: none;
     background: var(--accent-ink);
   }
+}
+
+/* ============================================================================
+   Shell placements, ported from UUI (src/app/shell, src/app/session).
+   Titlebar 36px with the tab strip; a 240px sidebar that resizes between 136 and
+   640 (SESSION rail); panels inset 8px on a deep background with hairline frames;
+   the session panel docked at 400px minimum; composer region pinned to the foot of
+   the timeline and growing it. Values are UUI's; the paint is ours.
+   ========================================================================== */
+
+.wb-top .spacer,
+.main-head .spacer,
+.composer-controls .spacer {
+  flex: 1;
+}
+
+/* titlebar: toggle, tab strip, ledger truth, connection */
+.sb-toggle,
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--fg-dim);
+  background: none;
+}
+
+.sb-toggle:hover,
+.icon-btn:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.sb-toggle[aria-pressed="true"] {
+  color: var(--fg);
+  border-color: var(--line);
+}
+
+.sb-toggle svg,
+.icon-btn svg {
+  inline-size: var(--glyph);
+  block-size: var(--glyph);
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.tab-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  block-size: 26px;
+  min-width: 0;
+  max-width: 340px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--s1);
+  color: var(--fg-dim);
+}
+
+.tab[aria-selected="true"] {
+  border-color: var(--line-strong);
+  background: var(--s2);
+  color: var(--fg);
+}
+
+.tab-title {
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--fg-faint);
+}
+
+.tab-new svg {
+  inline-size: 12px;
+  block-size: 12px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+/* sidebar: brand, new session, spaces, sessions, resize handle */
+.rail-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 24px;
+}
+
+.rail-brand .mark {
+  color: var(--accent-ink);
+}
+
+.new-session {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  block-size: var(--row);
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--fg-dim);
+  text-align: left;
+  font-size: var(--fs-body);
+}
+
+.new-session:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.new-session svg {
+  inline-size: 12px;
+  block-size: 12px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.new-session kbd {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-faint);
+}
+
+.rail-scroll {
+  display: grid;
+  gap: var(--sp-4);
+  align-content: start;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-2) var(--sp-2) var(--sp-3);
+}
+
+.rail-section {
+  display: grid;
+  gap: 2px;
+}
+
+.rail-resize {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: -3px;
+  inline-size: 6px;
+  cursor: col-resize;
+  background: none;
+  border: 0;
+  z-index: 1;
+}
+
+.rail-resize:hover,
+.rail-resize:focus-visible {
+  background: var(--line-strong);
+}
+
+.wb[data-rail="closed"] .wb-body {
+  grid-template-columns: 0 minmax(0, 1fr) var(--dock-w, var(--dock-min));
+}
+
+.wb[data-rail="closed"] .wb-rail {
+  border-inline-end-width: 0;
+  visibility: hidden;
+}
+
+/* session header + timeline + composer region */
+.wb-main {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--s1);
+  overflow: hidden;
+}
+
+.main-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--toolbar);
+  padding: 0 var(--sp-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.main-title {
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-title);
+  color: var(--fg);
+}
+
+.main-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-faint);
+}
+
+.timeline-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.thread {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: var(--sp-4) var(--sp-4) var(--sp-2);
+}
+
+.composer-region {
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
+  border-top: 1px solid var(--line);
+  background: var(--s1);
+}
+
+.composer-card {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.composer-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.ctl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  block-size: 22px;
+  min-width: 0;
+  max-width: 200px;
+  padding: 0 var(--sp-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--fg-dim);
+  font-size: var(--fs-meta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ctl:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.ctl svg {
+  inline-size: 12px;
+  block-size: 12px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  flex: 0 0 auto;
+}
+
+.send {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  block-size: 24px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--btn);
+  color: var(--btn-fg);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+}
+
+.send[disabled] {
+  background: none;
+  color: var(--fg-faint);
+  border-color: var(--line);
+}
+
+.send svg {
+  inline-size: 12px;
+  block-size: 12px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+/* appearance pane: theme grid lives in settings, as it does in UUI */
+.appearance {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.theme-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--sp-2);
+  align-items: center;
+  padding: var(--sp-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  text-align: left;
+}
+
+.theme-row[aria-pressed="true"] {
+  border-color: var(--accent-ink);
+}
+
+.theme-label {
+  font-size: var(--fs-body);
+  color: var(--fg);
+}
+
+.theme-blurb {
+  font-size: 10px;
+  color: var(--fg-faint);
+  line-height: 1.4;
+}
+
+.dock-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: var(--toolbar);
+  padding: 0 var(--sp-1) 0 var(--sp-2);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.dock-head .dock-tabs {
+  flex: 1;
+  border-bottom: 0;
+  background: none;
+  padding: 0;
+}
+
+.wb[data-dock="closed"] .wb-body {
+  grid-template-columns: var(--rail-w, var(--rail)) minmax(0, 1fr);
+}
+
+.wb[data-dock="closed"] .wb-dock {
+  display: none;
+}
+
+/* chrome controls sit on their own metrics, not the 28px row floor */
+.tab,
+.tab-new,
+.sb-toggle,
+.icon-btn,
+.ctl,
+.send {
+  min-height: 0;
+}
+
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+.seg button {
+  flex: 1;
+  min-height: 20px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: var(--fg-dim);
+  font-size: var(--fs-meta);
+  white-space: nowrap;
+}
+
+.seg button:hover {
+  color: var(--fg);
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--s2);
+  color: var(--fg);
+}
+
+.dock-head .dock-tabs {
+  border: 0;
+  padding: 0;
+  background: none;
 }

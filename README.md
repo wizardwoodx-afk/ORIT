@@ -10,6 +10,12 @@ with authority, and nothing outside the Gateway touches the world.
 
 ## What runs today
 
+The shell's geometry is UUI's (`Erealunetra/UUI`): 36px titlebar, 240px sidebar that resizes 136–640,
+panels inset 8px on the deep background, session panel docked at 400px minimum, composer pinned under
+the timeline. The paint, the motion and the themes are ours. Eight themes — Lunar Ash (default), Anvil,
+Moon, Jupiter, Mars, Uranus, Mercury, and AMOLED imported from UUI's theme set — each in dark and light,
+all measured for contrast (`npm run design:report`, 16 variants).
+
 ```
 npm run app        # builds the workbench, starts the harness on :4180  ->  http://localhost:4180/app/
 npm run verify     # typecheck, lint, tests, design report, slop scan, bundle
@@ -38,8 +44,8 @@ keychain integration yet. That is a release blocker (see `BUILD_PLAN.md`), not a
 | --- | --- |
 | Kernel: `core`, `ledger`, `grants`, `classifier`, `gateway`, `changeset`, `router` | built and tested |
 | App harness: `apps/server` (turns, approvals, channel, SSE) | running, partial against the plan |
-| Workbench: `apps/desktop/src/app` (rail, Thread, dock, composer, approval bar) | running, no Electron shell yet |
-| Design system: tokens, themes, type, motion, loaders, state glyphs, preview | done |
+| Workbench: `apps/desktop/src/app` (36px titlebar with tab strip, resizable sidebar, Thread, session panel, composer region, approval bar) | running, no Electron shell yet |
+| Design system: tokens, 8 themes × 2 modes, type, motion, loaders, state glyphs, preview | done |
 | Voice: `packages/voice` (sanctioned copy, banned-word audit) | done |
 | `memory` coordinator, skills registry, brain loop, web pipeline, drag and drop, Playwright run-through | not built |
 

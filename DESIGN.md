@@ -14,12 +14,43 @@ Dense, quiet, keyboard-first. The interface shows real state and gets out of the
 - **Two terminals:** the user's terminal (their authority) and the agent terminal (ticketed, read-only mirror with explicit take-over).
 - **Settings** as a full page like OpenCode: Appearance, Models and routing, Spaces and policy, Memory Center, Skills and tools, Browser (Camofox and ego(lite) separate), Privacy, About with `verify` results.
 
+### 2.1 As built (placements are UUI's)
+The workbench does not invent a layout. It takes UUI's (`Erealunetra/UUI`, `src/app/shell`, `src/app/session`)
+and repaints it:
+
+- **Titlebar 36px** carrying the sidebar toggle, the **tab strip** (one session tab per Space, with the live
+  state chip), and the ledger truth at the end.
+- **Sidebar 240px default, resizable 136–640** by drag or arrow keys, clamped and remembered; brand row,
+  `New session` row with its keybind, `Spaces`, then `Sessions`.
+- **Panels inset 8px** on the deep background, hairline frame and 6px radius, exactly as UUI frames its shell.
+- **Session panel docked at 400px minimum** — UUI's `SESSION_PANEL_WIDTH_MIN` — with `plan`, `receipts`,
+  `ledger`, `files`, and `appearance` as its panes. UUI puts theme choice in settings; so do we.
+- **Composer region pinned under the timeline**: bordered card, textarea, then the control row (assistant,
+  model, attach, dial, send). The card grows the timeline upward instead of floating.
+- Not yet built from that shell: the project tree above sessions, the command palette, deep link panes,
+  the peek sidebar, and the second terminal. ADR 0004 records the gap.
+
 ## 3. Tokens
-`apps/desktop/src/renderer/tokens.css` is the only file where raw color may live. Two themes, each in a
-dark and a light mode: **Anvil** (default, SelfImpulse ink and steel) and **Moon** (true OpenCode AMOLED,
-retained by owner instruction). The reference palettes the workbench was modelled on are gone (ADR 0002).
+`apps/desktop/src/renderer/tokens.css` is the only file where raw color may live. Eight themes, each in a
+dark and a light mode:
+
+| theme | note |
+| --- | --- |
+| **Lunar Ash** (default) | AMOLED soft. Cool ash on near-black. |
+| **Anvil** | SelfImpulse house. Ink, steel, warm bronze support. |
+| **Moon** | True AMOLED neutral. No tint, no chrome. |
+| **Jupiter** | Warm sepia and brass. |
+| **Mars** | Rust and dust. |
+| **Uranus** | Deep teal, cold and low glare. |
+| **Mercury** | Warm graphite. |
+| **AMOLED** | Imported from UUI's theme set (`src/theme/themes/amoled.json`), the only UUI palette carried across. |
+
+All seven owner palettes stay; the earlier cut to two themes was reversed (ADR 0002 now records both the
+attempt and the reversal). UUI's other 35 palettes are deliberately not imported: one theme proves the
+import path, thirty-five would be 35 unmeasured surface steps.
+
 `data-theme` selects the palette, `data-mode` the mode, and `data-contrast="high"` remaps dim text and
-lines across both themes instead of adding a third.
+lines across every theme instead of adding a ninth.
 
 Every theme defines the same 23-token contract: `--bg` page, `--s1` panel, `--s2` elevated control,
 `--line` and `--line-strong` hairlines, `--fg` / `--fg-dim` / `--fg-faint` text, `--btn` and `--btn-fg`
@@ -34,9 +65,12 @@ Rules:
 - Accents appear only as state: attention amber for needs-approval and blocked, danger for failed,
   `--co-think` / `--co-work` as a dot or a 1px rule for the Space identity. Success is a neutral check
   plus text, never green.
+- Imported palettes are borrowed hues, not borrowed colors. UUI's AMOLED ships `#00e676` on `#f0f0f0`
+  (1.4:1) for success and `#ffab00` (1.5:1) for warning in light mode; those become derived `--attn`
+  and `--danger` steps that clear the floors, and the raw values are recorded in ADR 0002.
 - Contrast floors are measured, not eyeballed: body 7:1, secondary 4.5:1, tertiary and state glyphs 3:1,
   control border 1.5:1, button label 4.5:1, text on a diff fill 4.5:1. `npm run design:report` fails the
-  build when any theme in either mode misses one.
+  build when any theme in either mode misses one — 16 variants today.
 
 ## 4. Type, spacing, icons
 - **UI:** IBM Plex Sans (400/500/600 + italic), for chrome, controls, labels.

@@ -6,7 +6,14 @@
  * fills the gap with guesses.
  */
 import { SIGNATURE } from '@si/voice';
-import { applyTheme, readChoice, writeChoice, type Mode, type ThemeId } from '../renderer/theme.ts';
+import {
+  applyTheme,
+  readChoice,
+  writeChoice,
+  type Mode,
+  type SerifId,
+  type ThemeId,
+} from '../renderer/theme.ts';
 import { api, type Snapshot, type ThreadEvent } from './api.ts';
 import { Workbench, type SpaceSummary } from './workbench.ts';
 
@@ -32,6 +39,18 @@ const workbench = new Workbench(mount, {
     writeChoice(localStorage, choice);
     workbench.setTheme(choice.theme, choice.mode);
   },
+  pickSerif: (serif) => {
+    choice = { ...choice, serif: serif as SerifId };
+    applyTheme(document.documentElement, choice);
+    writeChoice(localStorage, choice);
+    workbench.setAppearance(choice.serif, choice.highContrast);
+  },
+  pickContrast: (on) => {
+    choice = { ...choice, highContrast: on };
+    applyTheme(document.documentElement, choice);
+    writeChoice(localStorage, choice);
+    workbench.setAppearance(choice.serif, choice.highContrast);
+  },
   pickMode: (mode) => {
     choice = { ...choice, mode: mode as Mode };
     applyTheme(document.documentElement, choice);
@@ -41,6 +60,7 @@ const workbench = new Workbench(mount, {
 });
 
 workbench.setTheme(choice.theme, choice.mode);
+workbench.setAppearance(choice.serif, choice.highContrast);
 workbench.setStatus('connecting');
 
 const scheduleRefresh = (): void => {

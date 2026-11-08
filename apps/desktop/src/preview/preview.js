@@ -30,7 +30,7 @@ const SWATCHES = [
 const INSPECTOR_TOKENS = ['bg', 's1', 's2', 'line', 'line-strong', 'fg', 'fg-dim', 'fg-faint', 'accent', 'accent-ink', 'attn', 'danger'];
 
 const state = {
-  theme: 'anvil',
+  theme: 'lunar-ash',
   mode: 'dark',
   serif: 'source-serif',
   contrast: false,

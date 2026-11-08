@@ -1,17 +1,127 @@
-/* SelfImpulse design tokens — the only file where raw color may live (RULES 36, enforced by scripts/slop-scan.mjs).
+/* SelfImpulse design tokens — the only file where raw color may live (RULES 36; enforced by scripts/slop-scan.mjs).
  *
- * Theme registry: anvil (default, SelfImpulse) and moon (AMOLED, retained). Two modes each, plus a
- * high-contrast modifier that remaps semantics rather than adding a palette.
+ * Layer 1 (this file): raw values per theme and mode, plus type, space and motion scales.
+ * Layer 2 (components): var(--token) only. No literal colors anywhere else.
  *
- * Every theme defines the same 23-token contract. --accent is a FILL ONLY; --accent-ink is the same
- * hue pushed past 3:1 for glyphs and text. Values that are derived rather than chosen are marked, and
- * all of them are measured by scripts/design-report.mts.
+ * Eight themes, each authored in dark and light:
+ *   lunar-ash (default) · anvil (SelfImpulse) · moon · jupiter · mars · uranus · mercury · amoled
  *
- * Naming: --bg is the page, --s1 a panel, --s2 an elevated control (menu, popover, dock tab).
+ * The first seven are the owner's palette set and are all retained. `amoled` is imported from UUI's
+ * theme collection (src/theme/themes/amoled.json) — the only one of UUI's themes carried across; the
+ * rest are intentionally not imported. Every surface step, dim/faint text value, state hue and overlay
+ * alpha is derived per mode so each theme clears the contrast floors in scripts/design-report.mts.
+ *
+ * --accent is a FILL ONLY (selection bars, focus, key marks). --accent-ink is the same hue pushed past
+ * 3:1 on the page for text and glyphs.
  */
 
 :root {
-  /* ---------- anvil (default): SelfImpulse ink ---------- */
+  color-scheme: dark;
+  --bg: #000000;
+  --s1: #080808;
+  --s2: #101010;
+  --line: #1a1a1a;
+  --line-strong: #303034;
+  --fg: #e8ebf0;
+  --fg-dim: #a0a5b0;
+  --fg-faint: #6c727e;
+  --accent: #c2c7d0;
+  --accent-ink: #c2c7d0;
+  --btn: #e8ebf0;
+  --btn-fg: #0a0b0d;
+  --co-think: #c2c7d0;
+  --co-work: #6e9c8b;
+  --attn: #e0b04f;
+  --danger: #e0605a;
+  --diff-add: #12241b;
+  --diff-del: #2a1614;
+  --hover: #ffffff08;
+  --active: #ffffff12;
+  --selected: #ffffff1a;
+  --scrim: #000000b3;
+  --focus: #c2c7d0;
+
+  --font-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --fs-meta: 11px;
+  --fs-body: 13px;
+  --fs-section: 15px;
+  --fs-read: 17px;
+  --fs-title: 20px;
+  --lh-meta: 1.35;
+  --lh-body: 1.55;
+  --lh-read: 1.6;
+  --lh-title: 1.25;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --tracking-title: -0.01em;
+  --tracking-meta: 0.04em;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --row: 28px;
+  --toolbar: 32px;
+  --titlebar: 36px;
+  --rail: 240px;
+  --rail-min: 136px;
+  --rail-max: 640px;
+  --dock-min: 400px;
+  --inset: 8px;
+  --glyph: 16px;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --t-micro: 120ms;
+  --t-panel: 200ms;
+  --t-wipe: 200ms;
+  --t-shimmer: 1600ms;
+  --t-cursor: 1000ms;
+  --t-stagger: 40ms;
+  --t-skeleton: 300ms;
+  --rise: 8px;
+  --z-dock: 10;
+  --z-approval: 20;
+  --z-palette: 30;
+  --z-toast: 40;
+}
+
+
+/* ---------- Lunar Ash · light ---------- */
+:root[data-theme="lunar-ash"][data-mode="light"] {
+  color-scheme: light;
+  --bg: #f7f8fa;
+  --s1: #ffffff;
+  --s2: #eef0f3;
+  --line: #d8dce2;
+  --line-strong: #b9bfc9;
+  --fg: #1a1c20;
+  --fg-dim: #5a5f68;
+  --fg-faint: #7c828c;
+  --accent: #6b7280;
+  --accent-ink: #6b7280;
+  --btn: #1a1c20;
+  --btn-fg: #f7f8fa;
+  --co-think: #4e5560;
+  --co-work: #3f6b5a;
+  --attn: #8a6410;
+  --danger: #b03a34;
+  --diff-add: #e2f0e6;
+  --diff-del: #f8e3e2;
+  --hover: #00000006;
+  --active: #0000000f;
+  --selected: #00000014;
+  --scrim: #00000066;
+  --focus: #6b7280;
+}
+
+/* ---------- Anvil · dark (SelfImpulse house. Ink and steel, warm bronze support.) ---------- */
+:root[data-theme="anvil"] {
   color-scheme: dark;
   --bg: #0a0a0b;
   --s1: #111113;
@@ -36,89 +146,37 @@
   --selected: #ffffff1a;
   --scrim: #000000b3;
   --focus: #a9b4c2;
-
-  /* ---------- type ---------- */
-  --font-ui: "IBM Plex Sans", system-ui, sans-serif;
-  --font-serif: "Source Serif 4", Georgia, serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --fs-meta: 11px;
-  --fs-body: 13px;
-  --fs-section: 15px;
-  --fs-read: 17px;
-  --fs-title: 20px;
-  --lh-meta: 1.35;
-  --lh-body: 1.55;
-  --lh-read: 1.6;
-  --lh-title: 1.25;
-  --fw-regular: 400;
-  --fw-medium: 500;
-  --fw-semibold: 600;
-  --tracking-title: -0.01em;
-  --tracking-meta: 0.04em;
-
-  /* ---------- space, shape, density ---------- */
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 20px;
-  --sp-6: 24px;
-  --sp-8: 32px;
-  --radius: 6px;
-  --radius-sm: 4px;
-  --row: 28px;
-  --toolbar: 32px;
-  --rail: 264px;
-  --dock-min: 360px;
-  --glyph: 16px;
-
-  /* ---------- motion (DESIGN 6: transform and opacity only, never over 300ms) ---------- */
-  --ease: cubic-bezier(0.2, 0, 0, 1);
-  --t-micro: 120ms;
-  --t-panel: 200ms;
-  --t-wipe: 200ms;
-  --t-shimmer: 1600ms;
-  --t-cursor: 1000ms;
-  --t-stagger: 40ms;
-  --t-skeleton: 300ms;
-  --rise: 8px;
-
-  /* ---------- stacking ---------- */
-  --z-dock: 10;
-  --z-approval: 20;
-  --z-palette: 30;
-  --z-toast: 40;
 }
 
-/* ---------- anvil · light: paper for bright rooms ---------- */
+/* ---------- Anvil · light ---------- */
 :root[data-theme="anvil"][data-mode="light"] {
   color-scheme: light;
   --bg: #f5f4f1;
   --s1: #ffffff;
   --s2: #ecebe7;
   --line: #dcd9d3;
-  --line-strong: #bdb9b1;
+  --line-strong: #b8b4ac;
   --fg: #191a1c;
   --fg-dim: #575a5e;
-  --fg-faint: #77798c;
+  --fg-faint: #767879;
   --accent: #a9b4c2;
-  --accent-ink: #4c5f72;
+  --accent-ink: #3f5265;
   --btn: #191a1c;
   --btn-fg: #f5f4f1;
   --co-think: #6b6152;
-  --co-work: #3e626e;
-  --attn: #8a5f10;
-  --danger: #af3a34;
+  --co-work: #33565f;
+  --attn: #7d5510;
+  --danger: #a8352f;
   --diff-add: #e3efe6;
   --diff-del: #f8e3e1;
   --hover: #00000006;
   --active: #0000000f;
   --selected: #00000014;
   --scrim: #00000066;
-  --focus: #4c5f72;
+  --focus: #3f5265;
 }
 
-/* ---------- moon: true OpenCode AMOLED, retained ---------- */
+/* ---------- Moon · dark (True AMOLED neutral. No tint, no chrome.) ---------- */
 :root[data-theme="moon"] {
   color-scheme: dark;
   --bg: #080808;
@@ -146,6 +204,7 @@
   --focus: #c8c8c8;
 }
 
+/* ---------- Moon · light ---------- */
 :root[data-theme="moon"][data-mode="light"] {
   color-scheme: light;
   --bg: #fafafa;
@@ -173,6 +232,286 @@
   --focus: #767676;
 }
 
+/* ---------- Jupiter · dark (Warm sepia and brass. Desk lamp after midnight.) ---------- */
+:root[data-theme="jupiter"] {
+  color-scheme: dark;
+  --bg: #0c0907;
+  --s1: #1a140e;
+  --s2: #241c14;
+  --line: #3a3024;
+  --line-strong: #54452f;
+  --fg: #f5e6c8;
+  --fg-dim: #d2c4a8;
+  --fg-faint: #9a8b70;
+  --accent: #d39c7e;
+  --accent-ink: #d39c7e;
+  --btn: #c88b3a;
+  --btn-fg: #12100c;
+  --co-think: #d39c7e;
+  --co-work: #94a277;
+  --attn: #e8b455;
+  --danger: #e0705a;
+  --diff-add: #1c2416;
+  --diff-del: #2e1a12;
+  --hover: #f5e6c80a;
+  --active: #f5e6c814;
+  --selected: #f5e6c81e;
+  --scrim: #060403b3;
+  --focus: #e8b455;
+}
+
+/* ---------- Jupiter · light ---------- */
+:root[data-theme="jupiter"][data-mode="light"] {
+  color-scheme: light;
+  --bg: #fbf7f0;
+  --s1: #ffffff;
+  --s2: #f3ede3;
+  --line: #e0d5c4;
+  --line-strong: #c6b8a2;
+  --fg: #2a2118;
+  --fg-dim: #6b5c4a;
+  --fg-faint: #857463;
+  --accent: #d39c7e;
+  --accent-ink: #9a5a32;
+  --btn: #c88b3a;
+  --btn-fg: #12100c;
+  --co-think: #9a5a32;
+  --co-work: #55663a;
+  --attn: #8a5a10;
+  --danger: #b2452f;
+  --diff-add: #e8efdf;
+  --diff-del: #f7e5db;
+  --hover: #2a211808;
+  --active: #2a211810;
+  --selected: #2a211816;
+  --scrim: #00000066;
+  --focus: #9a5a32;
+}
+
+/* ---------- Mars · dark (Rust and dust. Thermal warm.) ---------- */
+:root[data-theme="mars"] {
+  color-scheme: dark;
+  --bg: #0e0706;
+  --s1: #1a0e0c;
+  --s2: #241612;
+  --line: #3a2820;
+  --line-strong: #55392d;
+  --fg: #e8c8b0;
+  --fg-dim: #c4a090;
+  --fg-faint: #917063;
+  --accent: #e27b58;
+  --accent-ink: #e27b58;
+  --btn: #c67b5c;
+  --btn-fg: #140b09;
+  --co-think: #e27b58;
+  --co-work: #6f9a94;
+  --attn: #f0b060;
+  --danger: #e0605a;
+  --diff-add: #16241d;
+  --diff-del: #2f1614;
+  --hover: #e8c8b00a;
+  --active: #e8c8b014;
+  --selected: #e8c8b01e;
+  --scrim: #080302b3;
+  --focus: #f0b060;
+}
+
+/* ---------- Mars · light ---------- */
+:root[data-theme="mars"][data-mode="light"] {
+  color-scheme: light;
+  --bg: #fbf5f2;
+  --s1: #ffffff;
+  --s2: #f5ebe6;
+  --line: #e0d0c8;
+  --line-strong: #c6b0a4;
+  --fg: #2a1814;
+  --fg-dim: #6b4a40;
+  --fg-faint: #86655b;
+  --accent: #e27b58;
+  --accent-ink: #a8442a;
+  --btn: #c67b5c;
+  --btn-fg: #140b09;
+  --co-think: #a8442a;
+  --co-work: #2f625d;
+  --attn: #8a5a12;
+  --danger: #b23a2a;
+  --diff-add: #e6f0e9;
+  --diff-del: #f7e0da;
+  --hover: #2a181408;
+  --active: #2a181410;
+  --selected: #2a181416;
+  --scrim: #00000066;
+  --focus: #a8442a;
+}
+
+/* ---------- Uranus · dark (Deep teal. Cold, clinical, low glare.) ---------- */
+:root[data-theme="uranus"] {
+  color-scheme: dark;
+  --bg: #04080a;
+  --s1: #0a1214;
+  --s2: #101a1c;
+  --line: #1a2a2c;
+  --line-strong: #2b4143;
+  --fg: #c8e8e6;
+  --fg-dim: #7aa8a4;
+  --fg-faint: #5c8582;
+  --accent: #5ec8c0;
+  --accent-ink: #5ec8c0;
+  --btn: #3aa8a0;
+  --btn-fg: #04100f;
+  --co-think: #5ec8c0;
+  --co-work: #c8b45e;
+  --attn: #e8c06a;
+  --danger: #e8706a;
+  --diff-add: #102420;
+  --diff-del: #2c1614;
+  --hover: #c8e8e60a;
+  --active: #c8e8e614;
+  --selected: #c8e8e61e;
+  --scrim: #020505b3;
+  --focus: #5ec8c0;
+}
+
+/* ---------- Uranus · light ---------- */
+:root[data-theme="uranus"][data-mode="light"] {
+  color-scheme: light;
+  --bg: #f0f7f7;
+  --s1: #ffffff;
+  --s2: #e4f0f0;
+  --line: #c8d8d8;
+  --line-strong: #a4bdbf;
+  --fg: #0f2a2a;
+  --fg-dim: #4a7070;
+  --fg-faint: #648686;
+  --accent: #5ec8c0;
+  --accent-ink: #12726b;
+  --btn: #3aa8a0;
+  --btn-fg: #04100f;
+  --co-think: #12726b;
+  --co-work: #6e5a12;
+  --attn: #7e6418;
+  --danger: #a83e3c;
+  --diff-add: #dceee9;
+  --diff-del: #f6e1de;
+  --hover: #0f2a2a08;
+  --active: #0f2a2a10;
+  --selected: #0f2a2a16;
+  --scrim: #00000066;
+  --focus: #12726b;
+}
+
+/* ---------- Mercury · dark (Warm graphite. Quiet grey.) ---------- */
+:root[data-theme="mercury"] {
+  color-scheme: dark;
+  --bg: #0c0b0a;
+  --s1: #151413;
+  --s2: #1e1c1b;
+  --line: #2c2a28;
+  --line-strong: #45423f;
+  --fg: #e8e4df;
+  --fg-dim: #b0aaa4;
+  --fg-faint: #827d77;
+  --accent: #9e9a93;
+  --accent-ink: #9e9a93;
+  --btn: #8a8580;
+  --btn-fg: #0c0b0a;
+  --co-think: #b8b2a8;
+  --co-work: #8e9a92;
+  --attn: #e0b04f;
+  --danger: #e0605a;
+  --diff-add: #182019;
+  --diff-del: #2a1917;
+  --hover: #e8e4df0a;
+  --active: #e8e4df14;
+  --selected: #e8e4df1e;
+  --scrim: #050404b3;
+  --focus: #e0b04f;
+}
+
+/* ---------- Mercury · light ---------- */
+:root[data-theme="mercury"][data-mode="light"] {
+  color-scheme: light;
+  --bg: #faf9f7;
+  --s1: #ffffff;
+  --s2: #f2f0ed;
+  --line: #e2ded8;
+  --line-strong: #c8c3bc;
+  --fg: #1c1a18;
+  --fg-dim: #6a655f;
+  --fg-faint: #837d76;
+  --accent: #9e9a93;
+  --accent-ink: #5f5b55;
+  --btn: #8a8580;
+  --btn-fg: #0c0b0a;
+  --co-think: #5a544a;
+  --co-work: #4a5750;
+  --attn: #8a6410;
+  --danger: #b03a34;
+  --diff-add: #e6eee7;
+  --diff-del: #f7e5e3;
+  --hover: #1c1a1808;
+  --active: #1c1a1810;
+  --selected: #1c1a1816;
+  --scrim: #00000066;
+  --focus: #5f5b55;
+}
+
+/* ---------- AMOLED · dark (Imported from UUI. Pure black, violet primary, neon accent.) ---------- */
+:root[data-theme="amoled"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --s1: #0a0a0a;
+  --s2: #121212;
+  --line: #242424;
+  --line-strong: #3d3d3d;
+  --fg: #ffffff;
+  --fg-dim: #a8a8a8;
+  --fg-faint: #767676;
+  --accent: #b388ff;
+  --accent-ink: #b388ff;
+  --btn: #ffffff;
+  --btn-fg: #000000;
+  --co-think: #b388ff;
+  --co-work: #18ffff;
+  --attn: #ffea00;
+  --danger: #ff5252;
+  --diff-add: #06210f;
+  --diff-del: #2a0710;
+  --hover: #ffffff08;
+  --active: #ffffff12;
+  --selected: #ffffff1a;
+  --scrim: #000000b3;
+  --focus: #b388ff;
+}
+
+/* ---------- AMOLED · light ---------- */
+:root[data-theme="amoled"][data-mode="light"] {
+  color-scheme: light;
+  --bg: #f0f0f0;
+  --s1: #ffffff;
+  --s2: #e4e4e4;
+  --line: #cfcfcf;
+  --line-strong: #a6a6a6;
+  --fg: #0a0a0a;
+  --fg-dim: #4a4a4a;
+  --fg-faint: #666666;
+  --accent: #6200ff;
+  --accent-ink: #5a00e8;
+  --btn: #0a0a0a;
+  --btn-fg: #f0f0f0;
+  --co-think: #5a00e8;
+  --co-work: #005f8f;
+  --attn: #7a5000;
+  --danger: #b3122f;
+  --diff-add: #dcf7e3;
+  --diff-del: #fbdce0;
+  --hover: #00000006;
+  --active: #0000000f;
+  --selected: #00000014;
+  --scrim: #00000066;
+  --focus: #5a00e8;
+}
+
 /* ---------- state tones: one mapping, every theme ---------- */
 :root {
   --tone-idle: var(--fg-faint);
@@ -194,15 +533,9 @@
 }
 
 /* ---------- serif face: one switch, three vendored faces (ADR 0001) ---------- */
-:root[data-serif="source-serif"] {
-  --font-serif: "Source Serif 4", Georgia, serif;
-}
-:root[data-serif="newsreader"] {
-  --font-serif: "Newsreader", Georgia, serif;
-}
-:root[data-serif="instrument"] {
-  --font-serif: "Instrument Serif", Georgia, serif;
-}
+:root[data-serif="source-serif"] { --font-serif: "Source Serif 4", Georgia, serif; }
+:root[data-serif="newsreader"] { --font-serif: "Newsreader", Georgia, serif; }
+:root[data-serif="instrument"] { --font-serif: "Instrument Serif", Georgia, serif; }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
